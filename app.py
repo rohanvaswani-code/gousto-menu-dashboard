@@ -283,12 +283,23 @@ with tab3:
         range=[GOUSTO_COLOR, HF_COLOR],
     )
 
-    bar = alt.Chart().mark_bar().encode(
-        x=alt.X("week:N", title=None, axis=alt.Axis(labelAngle=0)),
+    y_max = max(4.0, combined["value"].max() * 1.15)
+
+    bar = alt.Chart().mark_bar(size=28).encode(
+        x=alt.X("week:N", title=None,
+                axis=alt.Axis(labelAngle=0, labelFontSize=12, labelPadding=8)),
         xOffset=alt.XOffset("brand:N", sort=["Gousto", "HelloFresh"]),
-        y=alt.Y("value:Q", title=None, axis=alt.Axis(format="£.2f")),
-        color=alt.Color("brand:N", scale=color_scale, title=None,
-                        sort=["Gousto", "HelloFresh"]),
+        y=alt.Y(
+            "value:Q", title=None,
+            scale=alt.Scale(domain=[0, y_max]),
+            axis=alt.Axis(format="£.2f", tickCount=9, gridOpacity=0.4),
+        ),
+        color=alt.Color(
+            "brand:N", scale=color_scale,
+            sort=["Gousto", "HelloFresh"],
+            legend=alt.Legend(title=None, orient="top", direction="horizontal",
+                              symbolType="square", symbolSize=180),
+        ),
         tooltip=[
             alt.Tooltip("week:N", title="Week"),
             alt.Tooltip("brand:N", title="Brand"),
@@ -299,7 +310,7 @@ with tab3:
 
     text = (
         alt.Chart()
-        .mark_text(dy=-8, fontWeight="bold", fontSize=11)
+        .mark_text(dy=-10, fontWeight="bold", fontSize=12)
         .transform_filter(alt.datum.brand == "HelloFresh")
         .encode(
             x=alt.X("week:N"),
@@ -312,19 +323,24 @@ with tab3:
 
     chart = (
         alt.layer(bar, text, data=combined)
+        .properties(width=260, height=420)
         .facet(
             column=alt.Column(
                 "metric:N", title=None, sort=metrics,
-                header=alt.Header(labelFontSize=14, labelFontWeight="bold"),
+                header=alt.Header(labelFontSize=15, labelFontWeight="bold",
+                                  labelPadding=10, labelColor="#444"),
             ),
+            spacing=40,
         )
         .properties(title=alt.TitleParams(
             "Δ% = HelloFresh vs Gousto", anchor="end",
-            fontSize=12, color="#555",
+            fontSize=12, color="#777", dy=-8,
         ))
+        .configure_view(strokeOpacity=0)
+        .configure_axis(domainColor="#ccc", tickColor="#ccc")
     )
 
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, use_container_width=False)
 
     # Δ% summary table
     if not delta_df.empty:
