@@ -205,7 +205,7 @@ if logo_path is not None:
         mime = "image/png" if logo_path.suffix.lower() == ".png" else f"image/{logo_path.suffix.lstrip('.')}"
         b64 = base64.b64encode(logo_path.read_bytes()).decode()
         st.markdown(
-            f'<div style="text-align:right; padding-top:42px;">'
+            f'<div style="text-align:right; padding-top:20px;">'
             f'<img src="data:{mime};base64,{b64}" width="160"/></div>',
             unsafe_allow_html=True,
         )
