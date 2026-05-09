@@ -1,5 +1,5 @@
 selenium-wire
 blinker==1.7.0
-setuptools
+setuptools<81
 webdriver-manager
 requests
