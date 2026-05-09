@@ -458,24 +458,51 @@ with tab_gousto:
 
 # -------------------- SIDEBAR --------------------
 with st.sidebar:
-    st.subheader("Data archive")
-    st.caption(f"Gousto: {len(list(DATA_DIR.glob('gousto_menu_*.csv')))} snapshot(s)")
-    st.caption(f"HelloFresh: {len(list(HF_DIR.glob('*.csv'))) if HF_DIR.exists() else 0} file(s)")
-    st.caption(f"Prices: {len(list(PRICES_DIR.glob('*.csv'))) if PRICES_DIR.exists() else 0} weekly file(s)")
-    st.caption(
-        "Dashboard shows the **latest 3 weeks**; older snapshots remain in "
-        "`data/` for analysis."
+    st.markdown("### About")
+    st.markdown(
+        "Weekly comparison of **Gousto** and **HelloFresh** menus, looking at "
+        "price, calorie value, and weight value for the standard "
+        "**4-person × 5-meal** subscription box (20 servings)."
     )
-    if st.button("Reload data"):
-        st.cache_data.clear()
-        st.rerun()
+
     st.divider()
-    st.subheader("Tuesday update routine")
+    st.markdown("### Methodology")
+    st.markdown(
+        "**Box price** is the full weekly subscription price for a 4-person "
+        "× 5-meal box, taken from each brand's website."
+    )
+    st.markdown(
+        "**Price per serving** \n"
+        "`= Box price ÷ 20 servings`"
+    )
+    st.markdown(
+        "**Price per 100 kcal** \n"
+        "`= Price per serving ÷ (avg kcal per serving ÷ 100)`  \n"
+        "*Avg kcal per serving* is the mean across every recipe on that "
+        "week's menu (≈ 270–350 recipes for Gousto, ≈ 70 for HelloFresh)."
+    )
+    st.markdown(
+        "**Price per 100g** \n"
+        "`= Price per serving ÷ (avg grams per serving ÷ 100)`  \n"
+        "*Avg grams per serving* is calculated the same way."
+    )
+    st.markdown(
+        "**Δ% (delta)** \n"
+        "`= (HelloFresh − Gousto) ÷ Gousto`  \n"
+        f"<span style='color:{DELTA_RED}'>**Red**</span> = HelloFresh more expensive · "
+        f"<span style='color:{DELTA_GREEN}'>**Green**</span> = HelloFresh cheaper",
+        unsafe_allow_html=True,
+    )
+
+    st.divider()
+    st.markdown("### Data sources")
+    st.markdown(
+        "- **Gousto recipes**: scraped weekly from gousto.co.uk\n"
+        "- **HelloFresh recipes**: internal Databricks weekly export\n"
+        "- **Box prices**: manual weekly entry from each website"
+    )
     st.caption(
-        "1. Open the repo on github.com\n"
-        "2. `data/hellofresh/` → **Add file** → upload your weekly Databricks CSV\n"
-        "3. `data/prices/` → **Add file** → upload `prices_<YYYY-Www>.csv`\n"
-        "   (header: `Gousto,HelloFresh`; one data row of box prices)\n"
-        "4. Wait ~1 min for redeploy\n\n"
-        "**Wednesday 07:00 UTC**: Gousto scrapes itself, no action needed."
+        "The dashboard's *Pricing comparison* and *recipes* tabs show the latest "
+        "**3 weeks** (current + next two). The *Historic trends* tab grows over "
+        "time as new weeks are added."
     )
