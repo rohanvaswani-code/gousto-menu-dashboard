@@ -141,10 +141,12 @@ with tab2:
                 st.caption(label)
                 hist = f[col].dropna()
                 if len(hist):
-                    st.bar_chart(
-                        pd.cut(hist, bins=20).value_counts().sort_index().rename_axis("bin").reset_index(name="count"),
-                        x="bin", y="count", height=200,
-                    )
+                    binned = pd.cut(hist, bins=20).value_counts().sort_index()
+                    chart_df = pd.DataFrame({
+                        "bin": [f"{iv.left:.0f}–{iv.right:.0f}" for iv in binned.index],
+                        "count": binned.values,
+                    })
+                    st.bar_chart(chart_df, x="bin", y="count", height=200)
 
     st.subheader("Top recipes")
     if len(f):
