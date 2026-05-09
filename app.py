@@ -12,6 +12,7 @@ from plotly.subplots import make_subplots
 DATA_DIR = Path(__file__).resolve().parent / "data"
 HF_DIR = DATA_DIR / "hellofresh"
 PRICES_DIR = DATA_DIR / "prices"
+ASSETS_DIR = Path(__file__).resolve().parent / "assets"
 
 NUM_PORTIONS = 4
 MEALS_PER_BOX = 5
@@ -190,7 +191,19 @@ gousto = gousto_all[gousto_all["week"].isin(visible_weeks)] if not gousto_all.em
 hf = hf_all[hf_all["week"].isin(visible_weeks)] if not hf_all.empty else hf_all
 prices = prices_all[prices_all["week"].isin(visible_weeks)] if not prices_all.empty else prices_all
 
-st.title("Gousto vs HelloFresh Menu Dashboard")
+logo_candidates = [ASSETS_DIR / "hellofresh_logo.png",
+                   ASSETS_DIR / "hellofresh_logo.svg",
+                   ASSETS_DIR / "hellofresh_logo.jpg"]
+logo_path = next((p for p in logo_candidates if p.exists()), None)
+
+if logo_path is not None:
+    col_title, col_logo = st.columns([5, 1])
+    with col_title:
+        st.title("Gousto vs HelloFresh Menu Dashboard")
+    with col_logo:
+        st.image(str(logo_path), width=160)
+else:
+    st.title("Gousto vs HelloFresh Menu Dashboard")
 
 if gousto.empty and hf.empty:
     st.warning(
@@ -324,7 +337,7 @@ with tab_pricing:
             if c in disp.columns:
                 disp[c] = disp[c].round(1)
         st.dataframe(
-            disp.rename(columns={"week": "hellofresh week"}),
+            disp.rename(columns={"week": "hellofresh_week"}),
             use_container_width=True, hide_index=True,
         )
 
@@ -389,7 +402,7 @@ with tab_trends:
                     disp[c] = disp[c].round(1)
             st.dataframe(
                 disp.sort_values(["week", "brand"])
-                    .rename(columns={"week": "hellofresh week"}),
+                    .rename(columns={"week": "hellofresh_week"}),
                 use_container_width=True, hide_index=True,
             )
 
@@ -411,9 +424,9 @@ with tab_hf:
         show["kcal_per_serving"] = show["kcal_per_serving"].round(0)
         show["kj_per_serving"] = show["kj_per_serving"].round(0)
         show["grams_per_serving"] = show["grams_per_serving"].round(1)
-        show = show.rename(columns={"week": "hellofresh week"})
+        show = show.rename(columns={"week": "hellofresh_week"})
         st.dataframe(
-            show.sort_values(["hellofresh week", "slot_number"], ascending=[False, True]),
+            show.sort_values(["hellofresh_week", "slot_number"], ascending=[False, True]),
             use_container_width=True, hide_index=True,
         )
         st.download_button(
@@ -447,7 +460,7 @@ with tab_gousto:
         ]
         cols = [c for c in cols if c in f.columns]
         out = f[cols].sort_values(["week", "name"], ascending=[False, True])
-        out = out.rename(columns={"week": "hellofresh week"})
+        out = out.rename(columns={"week": "hellofresh_week"})
         st.dataframe(out, use_container_width=True, hide_index=True)
         st.download_button(
             "Download filtered CSV",
