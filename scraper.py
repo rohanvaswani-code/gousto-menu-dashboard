@@ -95,7 +95,37 @@ def fetch_menu(session, url_template, delivery_date, num_portions):
     r = session.get(url, timeout=30)
     r.raise_for_status()
     data = r.json()
-    return data.get("recipes", {}), data.get("period", {})
+    all_recipes = data.get("recipes", {})
+
+    # Filter to the customer-facing "All Recipes" category — matches what users
+    # see on gousto.co.uk/menu (~189). The full `recipes` dict (~271) includes
+    # sub-category-only items like Health Hub / Desserts & Sides / Premium.
+    categories = data.get("categories", {})
+    if isinstance(categories, dict):
+        cats_iter = categories.values()
+    else:
+        cats_iter = categories
+    visible_ids = None
+    for c in cats_iter:
+        if isinstance(c, dict) and c.get("slug") == "all-recipes":
+            ids = []
+            for entry in (c.get("recipes") or []):
+                if isinstance(entry, str):
+                    ids.append(entry)
+                elif isinstance(entry, dict):
+                    rid = entry.get("id") or entry.get("core_recipe_id")
+                    if rid:
+                        ids.append(str(rid))
+            visible_ids = set(ids)
+            break
+
+    if visible_ids:
+        recipes = {rid: r for rid, r in all_recipes.items() if rid in visible_ids}
+        print(f"   filtered to 'all-recipes' category: {len(recipes)} (was {len(all_recipes)})")
+    else:
+        recipes = all_recipes
+        print(f"   no 'all-recipes' category found — keeping all {len(all_recipes)}")
+    return recipes, data.get("period", {})
 
 
 # -------------------- COOKBOOK MAP --------------------
