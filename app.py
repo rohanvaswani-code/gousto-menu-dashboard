@@ -25,7 +25,7 @@ HF_COLOR = "#2EA47B"
 DELTA_RED = "#C0392B"
 DELTA_GREEN = "#1E8449"
 
-st.set_page_config(page_title="Gousto vs HelloFresh", layout="wide")
+st.set_page_config(page_title="Menu Miner 1.0", layout="wide")
 
 
 def to_week(d):
@@ -200,7 +200,7 @@ logo_path = next((p for p in logo_candidates if p.exists()), None)
 if logo_path is not None:
     col_title, col_logo = st.columns([5, 1])
     with col_title:
-        st.title("Gousto vs HelloFresh Menu Dashboard")
+        st.title("Menu Miner 1.0 — Gousto vs HelloFresh Menu Dashboard")
     with col_logo:
         mime = "image/png" if logo_path.suffix.lower() == ".png" else f"image/{logo_path.suffix.lstrip('.')}"
         b64 = base64.b64encode(logo_path.read_bytes()).decode()
@@ -210,7 +210,7 @@ if logo_path is not None:
             unsafe_allow_html=True,
         )
 else:
-    st.title("Gousto vs HelloFresh Menu Dashboard")
+    st.title("Menu Miner 1.0 — Gousto vs HelloFresh Menu Dashboard")
 
 if gousto.empty and hf.empty:
     st.warning(
