@@ -30,7 +30,9 @@ jobs:
           chrome-version: stable
 
       - name: Install scraper dependencies
-        run: pip install -r requirements-scraper.txt
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements-scraper.txt
 
       - name: Run scraper
         run: python scraper.py
