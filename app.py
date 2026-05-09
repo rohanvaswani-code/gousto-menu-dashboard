@@ -199,13 +199,6 @@ if gousto.empty and hf.empty:
     )
     st.stop()
 
-if visible_weeks:
-    st.caption(
-        f"Showing **{len(visible_weeks)} week(s)**: "
-        f"{', '.join(visible_weeks)}. "
-        f"Older scrapes are preserved in `data/` for analysis but not displayed."
-    )
-
 METRICS = ["Per serving", "Per 100 cal", "Per 100g"]
 METRIC_AXIS_TITLE = {
     "Per serving": "Price per serving (£)",
@@ -293,7 +286,7 @@ with tab_pricing:
             yaxis=dict(title=METRIC_AXIS_TITLE[metric_name],
                        range=[0, y_max], tickformat="£.2f",
                        gridcolor="rgba(0,0,0,0.08)"),
-            xaxis=dict(showgrid=False),
+            xaxis=dict(title="HelloFresh week", showgrid=False),
             barmode="group", bargap=0.30, bargroupgap=0.05,
             height=400,
             margin=dict(l=70, r=20, t=50, b=40),
@@ -330,7 +323,10 @@ with tab_pricing:
         for c in ("avg_kcal_per_serving", "avg_grams_per_serving"):
             if c in disp.columns:
                 disp[c] = disp[c].round(1)
-        st.dataframe(disp, use_container_width=True, hide_index=True)
+        st.dataframe(
+            disp.rename(columns={"week": "hellofresh week"}),
+            use_container_width=True, hide_index=True,
+        )
 
 
 # -------------------- TAB: HISTORIC TRENDS (full data, growing) --------------------
@@ -368,7 +364,7 @@ with tab_trends:
             fig.update_layout(
                 title=dict(text=axis_title, x=0.5, xanchor="center",
                            font=dict(size=16, color="#333")),
-                xaxis=dict(title="Week", showgrid=False),
+                xaxis=dict(title="HelloFresh week", showgrid=False),
                 yaxis=dict(title=axis_title, tickformat="£.2f",
                            gridcolor="rgba(0,0,0,0.08)"),
                 height=380,
@@ -391,8 +387,11 @@ with tab_trends:
             for c in ("avg_kcal_per_serving", "avg_grams_per_serving"):
                 if c in disp.columns:
                     disp[c] = disp[c].round(1)
-            st.dataframe(disp.sort_values(["week", "brand"]),
-                         use_container_width=True, hide_index=True)
+            st.dataframe(
+                disp.sort_values(["week", "brand"])
+                    .rename(columns={"week": "hellofresh week"}),
+                use_container_width=True, hide_index=True,
+            )
 
 # -------------------- TAB: HELLOFRESH --------------------
 with tab_hf:
@@ -401,10 +400,10 @@ with tab_hf:
         st.info("No HelloFresh data yet. Drop CSVs into `data/hellofresh/`.")
     else:
         weeks = sorted(hf["week"].unique(), reverse=True)
-        sel = st.multiselect("Menu week(s)", weeks, default=weeks, key="hf_weeks")
+        sel = st.multiselect("HelloFresh week(s)", weeks, default=weeks, key="hf_weeks")
         f = hf[hf["week"].isin(sel)]
         st.caption(
-            f"{len(f):,} recipe-rows across {f['week'].nunique()} week(s) · "
+            f"{len(f):,} recipe-rows across {f['week'].nunique()} HelloFresh week(s) · "
             f"{f['recipe_title'].nunique():,} unique recipes"
         )
         show = f[["week", "slot_number", "recipe_title",
@@ -412,8 +411,9 @@ with tab_hf:
         show["kcal_per_serving"] = show["kcal_per_serving"].round(0)
         show["kj_per_serving"] = show["kj_per_serving"].round(0)
         show["grams_per_serving"] = show["grams_per_serving"].round(1)
+        show = show.rename(columns={"week": "hellofresh week"})
         st.dataframe(
-            show.sort_values(["week", "slot_number"], ascending=[False, True]),
+            show.sort_values(["hellofresh week", "slot_number"], ascending=[False, True]),
             use_container_width=True, hide_index=True,
         )
         st.download_button(
@@ -429,12 +429,12 @@ with tab_gousto:
         st.info("No Gousto data yet.")
     else:
         weeks = sorted(gousto["week"].unique(), reverse=True)
-        sel = st.multiselect("Menu week(s)", weeks, default=weeks, key="g_weeks")
+        sel = st.multiselect("HelloFresh week(s)", weeks, default=weeks, key="g_weeks")
         f = gousto[gousto["week"].isin(sel)].copy()
         # Format menu_week_start as DD/MM/YYYY
         f["menu_date"] = pd.to_datetime(f["menu_week_start"], errors="coerce").dt.strftime("%d/%m/%Y")
         st.caption(
-            f"{len(f):,} recipe-rows across {f['week'].nunique()} week(s) · "
+            f"{len(f):,} recipe-rows across {f['week'].nunique()} HelloFresh week(s) · "
             f"{f['name'].nunique():,} unique recipes"
         )
         cols = [
@@ -446,13 +446,12 @@ with tab_gousto:
             "rating_avg", "rating_count",
         ]
         cols = [c for c in cols if c in f.columns]
-        st.dataframe(
-            f[cols].sort_values(["week", "name"], ascending=[False, True]),
-            use_container_width=True, hide_index=True,
-        )
+        out = f[cols].sort_values(["week", "name"], ascending=[False, True])
+        out = out.rename(columns={"week": "hellofresh week"})
+        st.dataframe(out, use_container_width=True, hide_index=True)
         st.download_button(
             "Download filtered CSV",
-            f[cols].to_csv(index=False).encode("utf-8"),
+            out.to_csv(index=False).encode("utf-8"),
             "gousto_filtered.csv", "text/csv",
         )
 
