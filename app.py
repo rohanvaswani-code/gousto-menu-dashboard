@@ -1,5 +1,6 @@
 """Gousto vs HelloFresh menu + pricing dashboard."""
 
+import base64
 import re
 from datetime import date, timedelta
 from pathlib import Path
@@ -197,11 +198,17 @@ logo_candidates = [ASSETS_DIR / "hellofresh_logo.png",
 logo_path = next((p for p in logo_candidates if p.exists()), None)
 
 if logo_path is not None:
-    col_title, col_logo = st.columns([5, 1], vertical_alignment="center")
+    col_title, col_logo = st.columns([5, 1])
     with col_title:
         st.title("Gousto vs HelloFresh Menu Dashboard")
     with col_logo:
-        st.image(str(logo_path), width=160)
+        mime = "image/png" if logo_path.suffix.lower() == ".png" else f"image/{logo_path.suffix.lstrip('.')}"
+        b64 = base64.b64encode(logo_path.read_bytes()).decode()
+        st.markdown(
+            f'<div style="text-align:right; padding-top:42px;">'
+            f'<img src="data:{mime};base64,{b64}" width="160"/></div>',
+            unsafe_allow_html=True,
+        )
 else:
     st.title("Gousto vs HelloFresh Menu Dashboard")
 
