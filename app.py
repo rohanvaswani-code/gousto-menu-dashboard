@@ -197,7 +197,7 @@ logo_candidates = [ASSETS_DIR / "hellofresh_logo.png",
 logo_path = next((p for p in logo_candidates if p.exists()), None)
 
 if logo_path is not None:
-    col_title, col_logo = st.columns([5, 1])
+    col_title, col_logo = st.columns([5, 1], vertical_alignment="center")
     with col_title:
         st.title("Gousto vs HelloFresh Menu Dashboard")
     with col_logo:
