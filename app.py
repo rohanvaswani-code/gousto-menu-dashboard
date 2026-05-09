@@ -283,7 +283,7 @@ with tab3:
         range=[GOUSTO_COLOR, HF_COLOR],
     )
 
-    y_max = max(4.0, combined["value"].max() * 1.15)
+    y_max = max(4.0, float(combined["value"].max()) * 1.15)
 
     bar = alt.Chart().mark_bar(size=28).encode(
         x=alt.X("week:N", title=None,
@@ -295,7 +295,8 @@ with tab3:
             axis=alt.Axis(format="£.2f", tickCount=9, gridOpacity=0.4),
         ),
         color=alt.Color(
-            "brand:N", scale=color_scale,
+            "brand:N",
+            scale=color_scale,
             sort=["Gousto", "HelloFresh"],
             legend=alt.Legend(title=None, orient="top", direction="horizontal",
                               symbolType="square", symbolSize=180),
@@ -323,7 +324,10 @@ with tab3:
 
     chart = (
         alt.layer(bar, text, data=combined)
-        .properties(width=260, height=420)
+        .properties(height=420, title=alt.TitleParams(
+            "Δ% = HelloFresh vs Gousto", anchor="end",
+            fontSize=12, color="#777", dy=-8,
+        ))
         .facet(
             column=alt.Column(
                 "metric:N", title=None, sort=metrics,
@@ -332,15 +336,9 @@ with tab3:
             ),
             spacing=40,
         )
-        .properties(title=alt.TitleParams(
-            "Δ% = HelloFresh vs Gousto", anchor="end",
-            fontSize=12, color="#777", dy=-8,
-        ))
-        .configure_view(strokeOpacity=0)
-        .configure_axis(domainColor="#ccc", tickColor="#ccc")
     )
 
-    st.altair_chart(chart, use_container_width=False)
+    st.altair_chart(chart, use_container_width=True)
 
     # Δ% summary table
     if not delta_df.empty:
