@@ -1,0 +1,48 @@
+name: Weekly Gousto scrape
+
+on:
+  schedule:
+    - cron: '0 7 * * WED'   # Every Wednesday at 07:00 UTC
+  workflow_dispatch: {}     # Allow manual trigger from the Actions tab
+
+permissions:
+  contents: write           # Needed to commit new CSVs back to the repo
+
+concurrency:
+  group: gousto-scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Install scraper dependencies
+        run: pip install -r requirements-scraper.txt
+
+      - name: Run scraper
+        run: python scraper.py
+
+      - name: Commit and push new CSVs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --quiet --cached; then
+            echo "No data changes to commit."
+          else
+            git commit -m "data: weekly scrape $(date -u +%Y-%m-%d)"
+            git push
+          fi
