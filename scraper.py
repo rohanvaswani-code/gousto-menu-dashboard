@@ -274,7 +274,7 @@ def scrape_week(session, url_template, weeks_ahead, uuid_to_slug, num_portions, 
         time.sleep(DETAIL_DELAY)
 
     rows.sort(key=lambda x: x["name"].lower())
-    out_path = OUTPUT_DIR / f"gousto_menu_{week_start}.csv"
+    out_path = OUTPUT_DIR / f"gousto_menu_{week_start}_{scraped_at}.csv"
     write_csv(rows, out_path)
     print(f"   per-100g coverage: {matched}/{total} ({matched/total*100:.0f}%)")
     return out_path

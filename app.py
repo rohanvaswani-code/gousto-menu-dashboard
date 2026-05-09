@@ -115,9 +115,22 @@ def load_prices():
 
 
 # -------------------- LOAD --------------------
-gousto = load_gousto()
-hf = load_hellofresh()
-prices = load_prices()
+gousto_all = load_gousto()
+hf_all = load_hellofresh()
+prices_all = load_prices()
+
+# Determine the latest 3 weeks present anywhere in the data — that's the
+# dashboard's rolling window. Older snapshots remain in data/ for analysis.
+all_weeks = sorted(
+    set(gousto_all.get("week", pd.Series(dtype=str)).dropna()) |
+    set(hf_all.get("week", pd.Series(dtype=str)).dropna()) |
+    set(prices_all.get("week", pd.Series(dtype=str)).dropna())
+)
+visible_weeks = all_weeks[-3:] if len(all_weeks) >= 3 else all_weeks
+
+gousto = gousto_all[gousto_all["week"].isin(visible_weeks)] if not gousto_all.empty else gousto_all
+hf = hf_all[hf_all["week"].isin(visible_weeks)] if not hf_all.empty else hf_all
+prices = prices_all[prices_all["week"].isin(visible_weeks)] if not prices_all.empty else prices_all
 
 st.title("Gousto vs HelloFresh Menu Dashboard")
 
@@ -128,70 +141,17 @@ if gousto.empty and hf.empty:
     )
     st.stop()
 
-tab1, tab2, tab3 = st.tabs(["Gousto recipes", "HelloFresh recipes", "Pricing comparison"])
+if visible_weeks:
+    st.caption(
+        f"Showing **{len(visible_weeks)} week(s)**: "
+        f"{', '.join(visible_weeks)}. "
+        f"Older scrapes are preserved in `data/` for analysis but not displayed."
+    )
 
-# -------------------- TAB 1: GOUSTO --------------------
+tab1, tab2, tab3 = st.tabs(["Pricing comparison", "HelloFresh recipes", "Gousto recipes"])
+
+# -------------------- TAB 1: PRICING --------------------
 with tab1:
-    st.header("Gousto recipes by week")
-    if gousto.empty:
-        st.info("No Gousto data yet.")
-    else:
-        weeks = sorted(gousto["week"].unique(), reverse=True)
-        sel = st.multiselect("Menu week(s)", weeks, default=weeks, key="g_weeks")
-        f = gousto[gousto["week"].isin(sel)]
-        st.caption(
-            f"{len(f):,} recipe-rows across {f['week'].nunique()} week(s) · "
-            f"{f['name'].nunique():,} unique recipes"
-        )
-        cols = [
-            "week", "name", "food_brand",
-            "kcal_per_portion", "portion_weight_g",
-            "protein_g_per_portion", "fat_g_per_portion",
-            "carbs_g_per_portion", "fibre_g_per_portion", "salt_g_per_portion",
-            "prep_time_min", "spice_level", "dietary_claims",
-            "rating_avg", "rating_count",
-        ]
-        cols = [c for c in cols if c in f.columns]
-        st.dataframe(
-            f[cols].sort_values(["week", "name"], ascending=[False, True]),
-            use_container_width=True, hide_index=True,
-        )
-        st.download_button(
-            "Download filtered CSV",
-            f[cols].to_csv(index=False).encode("utf-8"),
-            "gousto_filtered.csv", "text/csv",
-        )
-
-# -------------------- TAB 2: HELLOFRESH --------------------
-with tab2:
-    st.header("HelloFresh recipes by week")
-    if hf.empty:
-        st.info("No HelloFresh data yet. Drop CSVs into `data/hellofresh/`.")
-    else:
-        weeks = sorted(hf["week"].unique(), reverse=True)
-        sel = st.multiselect("Menu week(s)", weeks, default=weeks, key="hf_weeks")
-        f = hf[hf["week"].isin(sel)]
-        st.caption(
-            f"{len(f):,} recipe-rows across {f['week'].nunique()} week(s) · "
-            f"{f['recipe_title'].nunique():,} unique recipes"
-        )
-        show = f[["week", "slot_number", "recipe_title",
-                  "kcal_per_serving", "kj_per_serving", "grams_per_serving"]].copy()
-        show["kcal_per_serving"] = show["kcal_per_serving"].round(0)
-        show["kj_per_serving"] = show["kj_per_serving"].round(0)
-        show["grams_per_serving"] = show["grams_per_serving"].round(1)
-        st.dataframe(
-            show.sort_values(["week", "slot_number"], ascending=[False, True]),
-            use_container_width=True, hide_index=True,
-        )
-        st.download_button(
-            "Download filtered CSV",
-            show.to_csv(index=False).encode("utf-8"),
-            "hellofresh_filtered.csv", "text/csv",
-        )
-
-# -------------------- TAB 3: PRICING --------------------
-with tab3:
     st.header(f"Weekly pricing comparison — {NUM_PORTIONS} people × {MEALS_PER_BOX} meals box")
 
     if prices.empty:
@@ -390,17 +350,88 @@ with tab3:
                 disp[c] = disp[c].round(1)
         st.dataframe(disp, use_container_width=True, hide_index=True)
 
+# -------------------- TAB 2: HELLOFRESH --------------------
+with tab2:
+    st.header("HelloFresh recipes by week")
+    if hf.empty:
+        st.info("No HelloFresh data yet. Drop CSVs into `data/hellofresh/`.")
+    else:
+        weeks = sorted(hf["week"].unique(), reverse=True)
+        sel = st.multiselect("Menu week(s)", weeks, default=weeks, key="hf_weeks")
+        f = hf[hf["week"].isin(sel)]
+        st.caption(
+            f"{len(f):,} recipe-rows across {f['week'].nunique()} week(s) · "
+            f"{f['recipe_title'].nunique():,} unique recipes"
+        )
+        show = f[["week", "slot_number", "recipe_title",
+                  "kcal_per_serving", "kj_per_serving", "grams_per_serving"]].copy()
+        show["kcal_per_serving"] = show["kcal_per_serving"].round(0)
+        show["kj_per_serving"] = show["kj_per_serving"].round(0)
+        show["grams_per_serving"] = show["grams_per_serving"].round(1)
+        st.dataframe(
+            show.sort_values(["week", "slot_number"], ascending=[False, True]),
+            use_container_width=True, hide_index=True,
+        )
+        st.download_button(
+            "Download filtered CSV",
+            show.to_csv(index=False).encode("utf-8"),
+            "hellofresh_filtered.csv", "text/csv",
+        )
+
+# -------------------- TAB 3: GOUSTO --------------------
+with tab3:
+    st.header("Gousto recipes by week")
+    if gousto.empty:
+        st.info("No Gousto data yet.")
+    else:
+        weeks = sorted(gousto["week"].unique(), reverse=True)
+        sel = st.multiselect("Menu week(s)", weeks, default=weeks, key="g_weeks")
+        f = gousto[gousto["week"].isin(sel)].copy()
+        # Format menu_week_start as DD/MM/YYYY
+        f["menu_date"] = pd.to_datetime(f["menu_week_start"], errors="coerce").dt.strftime("%d/%m/%Y")
+        st.caption(
+            f"{len(f):,} recipe-rows across {f['week'].nunique()} week(s) · "
+            f"{f['name'].nunique():,} unique recipes"
+        )
+        cols = [
+            "week", "menu_date", "name", "food_brand",
+            "kcal_per_portion", "portion_weight_g",
+            "protein_g_per_portion", "fat_g_per_portion",
+            "carbs_g_per_portion", "fibre_g_per_portion", "salt_g_per_portion",
+            "prep_time_min", "spice_level", "dietary_claims",
+            "rating_avg", "rating_count",
+        ]
+        cols = [c for c in cols if c in f.columns]
+        st.dataframe(
+            f[cols].sort_values(["week", "name"], ascending=[False, True]),
+            use_container_width=True, hide_index=True,
+        )
+        st.download_button(
+            "Download filtered CSV",
+            f[cols].to_csv(index=False).encode("utf-8"),
+            "gousto_filtered.csv", "text/csv",
+        )
+
 # -------------------- SIDEBAR --------------------
 with st.sidebar:
-    st.subheader("Data sources")
-    st.caption(f"Gousto: {len(list(DATA_DIR.glob('gousto_menu_*.csv')))} weekly file(s)")
+    st.subheader("Data archive")
+    st.caption(f"Gousto: {len(list(DATA_DIR.glob('gousto_menu_*.csv')))} snapshot(s)")
     st.caption(f"HelloFresh: {len(list(HF_DIR.glob('*.csv'))) if HF_DIR.exists() else 0} file(s)")
     st.caption(f"Prices: {len(list(PRICES_DIR.glob('*.csv'))) if PRICES_DIR.exists() else 0} weekly file(s)")
+    st.caption(
+        "Dashboard shows the **latest 3 weeks**; older snapshots remain in "
+        "`data/` for analysis."
+    )
     if st.button("Reload data"):
         st.cache_data.clear()
         st.rerun()
     st.divider()
+    st.subheader("Tuesday update routine")
     st.caption(
-        "**How to update:** drag CSVs into the matching folder on github.com → "
-        "the dashboard redeploys ~1 min later. Gousto auto-scrapes every Wed 07:00 UTC."
+        "1. Open the repo on github.com\n"
+        "2. `data/hellofresh/` → **Add file** → upload your weekly Databricks CSV\n"
+        "3. `data/prices/` → **Add file** → upload `prices_<YYYY-Www>.csv`\n"
+        "   (header: `Gousto,HelloFresh`; one data row of box prices)\n"
+        "4. Wait ~1 min for redeploy\n\n"
+        "**Wednesday 07:00 UTC**: Gousto scrapes itself, no action needed."
     )
