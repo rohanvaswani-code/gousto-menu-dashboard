@@ -4,9 +4,10 @@ import re
 from datetime import date, timedelta
 from pathlib import Path
 
-import altair as alt
 import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
+from plotly.subplots import make_subplots
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
 HF_DIR = DATA_DIR / "hellofresh"
@@ -278,73 +279,84 @@ with tab3:
         lambda x: DELTA_RED if pd.notna(x) and x > 0 else DELTA_GREEN
     )
 
-    color_scale = alt.Scale(
-        domain=["Gousto", "HelloFresh"],
-        range=[GOUSTO_COLOR, HF_COLOR],
+    y_max = max(4.0, float(combined["value"].max()) * 1.15)
+    weeks_sorted = sorted(combined["week"].unique())
+
+    fig = make_subplots(
+        rows=1, cols=len(metrics),
+        subplot_titles=metrics,
+        shared_yaxes=True,
+        horizontal_spacing=0.06,
     )
 
-    y_max = max(4.0, float(combined["value"].max()) * 1.15)
-
-    # Top row: legend on left, "Δ% = HelloFresh vs Gousto" annotation on right
-    legend_col, _, hint_col = st.columns([2, 4, 2])
-    with legend_col:
-        st.markdown(
-            f"<span style='display:inline-block;width:14px;height:14px;background:{GOUSTO_COLOR};margin-right:6px;vertical-align:middle'></span>"
-            f"<b>Gousto</b>"
-            f"&nbsp;&nbsp;&nbsp;<span style='display:inline-block;width:14px;height:14px;background:{HF_COLOR};margin-right:6px;vertical-align:middle'></span>"
-            f"<b>HelloFresh</b>",
-            unsafe_allow_html=True,
-        )
-    with hint_col:
-        st.markdown(
-            "<div style='text-align:right;color:#777;font-size:13px'>Δ% = HelloFresh vs Gousto</div>",
-            unsafe_allow_html=True,
-        )
-
-    panel_cols = st.columns(len(metrics))
-    for col, metric_name in zip(panel_cols, metrics):
-        df_m = combined[combined["metric"] == metric_name].copy()
-        df_text = df_m[df_m["brand"] == "HelloFresh"].copy()
-
-        bar = (
-            alt.Chart(df_m)
-            .mark_bar(size=22)
-            .encode(
-                x=alt.X("week:N", title=None,
-                        axis=alt.Axis(labelAngle=0, labelFontSize=12)),
-                xOffset=alt.XOffset("brand:N", sort=["Gousto", "HelloFresh"]),
-                y=alt.Y(
-                    "value:Q", title=None,
-                    scale=alt.Scale(domain=[0, y_max]),
-                    axis=alt.Axis(format="£.2f", tickCount=9, gridOpacity=0.4),
+    for col_idx, metric_name in enumerate(metrics, start=1):
+        df_m = combined[combined["metric"] == metric_name]
+        for brand, color in [("Gousto", GOUSTO_COLOR), ("HelloFresh", HF_COLOR)]:
+            df_b = (
+                df_m[df_m["brand"] == brand]
+                .set_index("week")
+                .reindex(weeks_sorted)
+                .reset_index()
+            )
+            fig.add_trace(
+                go.Bar(
+                    x=df_b["week"],
+                    y=df_b["value"],
+                    name=brand,
+                    marker_color=color,
+                    showlegend=(col_idx == 1),
+                    legendgroup=brand,
+                    hovertemplate="%{x}<br>" + brand + ": £%{y:.4f}<extra></extra>",
                 ),
-                color=alt.Color("brand:N", scale=color_scale,
-                                sort=["Gousto", "HelloFresh"], legend=None),
-                tooltip=[
-                    alt.Tooltip("week:N", title="Week"),
-                    alt.Tooltip("brand:N", title="Brand"),
-                    alt.Tooltip("value:Q", title="£", format=".4f"),
-                ],
+                row=1, col=col_idx,
             )
-        )
-        text = (
-            alt.Chart(df_text)
-            .mark_text(dy=-10, fontWeight="bold", fontSize=11)
-            .encode(
-                x=alt.X("week:N"),
-                xOffset=alt.value(6),
-                y=alt.Y("value:Q"),
-                text="label:N",
-                color=alt.Color("label_color:N", scale=None, legend=None),
+
+        # Δ% annotations above each HF bar
+        df_hf = df_m[df_m["brand"] == "HelloFresh"]
+        for _, r in df_hf.iterrows():
+            if pd.isna(r["delta"]):
+                continue
+            fig.add_annotation(
+                x=r["week"], y=r["value"],
+                text=f"<b>{r['delta']:+.1%}</b>",
+                showarrow=False,
+                yshift=14,
+                font=dict(
+                    color=DELTA_RED if r["delta"] > 0 else DELTA_GREEN,
+                    size=12,
+                ),
+                row=1, col=col_idx,
             )
-        )
-        panel = (bar + text).properties(height=380)
-        with col:
-            st.markdown(
-                f"<div style='text-align:center;font-weight:bold;font-size:15px;color:#444;margin-bottom:6px'>{metric_name}</div>",
-                unsafe_allow_html=True,
-            )
-            st.altair_chart(panel, use_container_width=True)
+
+    fig.update_yaxes(
+        range=[0, y_max], tickformat="£.2f", tickprefix="",
+        gridcolor="rgba(0,0,0,0.08)",
+    )
+    fig.update_xaxes(showgrid=False)
+    fig.update_layout(
+        barmode="group", bargap=0.25, bargroupgap=0.05,
+        height=440,
+        margin=dict(l=20, r=20, t=60, b=40),
+        plot_bgcolor="white",
+        legend=dict(orientation="h", x=0, y=1.12,
+                    yanchor="bottom", xanchor="left",
+                    bgcolor="rgba(0,0,0,0)"),
+        annotations=list(fig.layout.annotations) + [
+            dict(
+                text="Δ% = HelloFresh vs Gousto",
+                xref="paper", yref="paper",
+                x=1, y=1.10, xanchor="right", yanchor="bottom",
+                showarrow=False,
+                font=dict(size=12, color="#777"),
+            ),
+        ],
+    )
+    # Subplot titles styling
+    for ann in fig.layout.annotations:
+        if ann.text in metrics:
+            ann.font = dict(size=15, color="#444", family="Arial, sans-serif")
+
+    st.plotly_chart(fig, use_container_width=True)
 
     # Δ% summary table
     if not delta_df.empty:
