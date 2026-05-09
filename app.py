@@ -1,7 +1,7 @@
 """Gousto vs HelloFresh menu + pricing dashboard."""
 
 import re
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import altair as alt
@@ -25,12 +25,15 @@ DELTA_GREEN = "#1E8449"
 st.set_page_config(page_title="Gousto vs HelloFresh", layout="wide")
 
 
-def to_iso_week(d):
-    """Map 'YYYY-MM-DD' to ISO 'YYYY-Www'."""
+def to_week(d):
+    """Map a date to a HelloFresh-style 'YYYY-Www' week label.
+    HF weeks run Thursday–Wednesday (W19 = Thu 30 Apr → Wed 6 May 2026).
+    Shift forward 4 days so a Thursday lands on a Monday, then take ISO week."""
     if pd.isna(d) or not d:
         return ""
     try:
-        y, w, _ = date.fromisoformat(str(d)[:10]).isocalendar()
+        dt = date.fromisoformat(str(d)[:10]) + timedelta(days=4)
+        y, w, _ = dt.isocalendar()
         return f"{y}-W{w:02d}"
     except (ValueError, TypeError):
         return ""
@@ -53,7 +56,7 @@ def load_gousto():
             subset=["menu_week_start", "id"], keep="last"
         )
     df["menu_week_start"] = df["menu_week_start"].astype(str)
-    df["iso_week"] = df["menu_week_start"].apply(to_iso_week)
+    df["week"] = df["menu_week_start"].apply(to_week)
     for c in [
         "kcal_per_portion", "portion_weight_g", "protein_g_per_portion",
         "fat_g_per_portion", "carbs_g_per_portion", "fibre_g_per_portion",
@@ -78,21 +81,21 @@ def load_hellofresh():
     df["kj_per_serving"] = pd.to_numeric(df["calories"], errors="coerce")
     df["kcal_per_serving"] = df["kj_per_serving"] / KJ_PER_KCAL
     df["grams_per_serving"] = pd.to_numeric(df["grams"], errors="coerce")
-    df["iso_week"] = df["week"].astype(str)
+    df["week"] = df["week"].astype(str)
     return df
 
 
 @st.cache_data
 def load_prices():
-    """Return long-form: rows of (iso_week, brand, box_price)."""
+    """Return long-form: rows of (week, brand, box_price)."""
     if not PRICES_DIR.exists():
-        return pd.DataFrame(columns=["iso_week", "brand", "box_price"])
+        return pd.DataFrame(columns=["week", "brand", "box_price"])
     rows = []
     for f in sorted(PRICES_DIR.glob("*.csv")):
         m = re.search(r"(\d{4}-W\d{2})", f.stem)
         if not m:
             continue
-        iso_week = m.group(1)
+        week = m.group(1)
         df = pd.read_csv(f)
         if df.empty:
             continue
@@ -101,7 +104,7 @@ def load_prices():
             if brand in df.columns:
                 try:
                     rows.append({
-                        "iso_week": iso_week,
+                        "week": week,
                         "brand": brand,
                         "box_price": float(first[brand]),
                     })
@@ -132,15 +135,15 @@ with tab1:
     if gousto.empty:
         st.info("No Gousto data yet.")
     else:
-        weeks = sorted(gousto["iso_week"].unique(), reverse=True)
+        weeks = sorted(gousto["week"].unique(), reverse=True)
         sel = st.multiselect("Menu week(s)", weeks, default=weeks, key="g_weeks")
-        f = gousto[gousto["iso_week"].isin(sel)]
+        f = gousto[gousto["week"].isin(sel)]
         st.caption(
-            f"{len(f):,} recipe-rows across {f['iso_week'].nunique()} week(s) · "
+            f"{len(f):,} recipe-rows across {f['week'].nunique()} week(s) · "
             f"{f['name'].nunique():,} unique recipes"
         )
         cols = [
-            "iso_week", "name", "food_brand",
+            "week", "name", "food_brand",
             "kcal_per_portion", "portion_weight_g",
             "protein_g_per_portion", "fat_g_per_portion",
             "carbs_g_per_portion", "fibre_g_per_portion", "salt_g_per_portion",
@@ -149,7 +152,7 @@ with tab1:
         ]
         cols = [c for c in cols if c in f.columns]
         st.dataframe(
-            f[cols].sort_values(["iso_week", "name"], ascending=[False, True]),
+            f[cols].sort_values(["week", "name"], ascending=[False, True]),
             use_container_width=True, hide_index=True,
         )
         st.download_button(
@@ -164,20 +167,20 @@ with tab2:
     if hf.empty:
         st.info("No HelloFresh data yet. Drop CSVs into `data/hellofresh/`.")
     else:
-        weeks = sorted(hf["iso_week"].unique(), reverse=True)
+        weeks = sorted(hf["week"].unique(), reverse=True)
         sel = st.multiselect("Menu week(s)", weeks, default=weeks, key="hf_weeks")
-        f = hf[hf["iso_week"].isin(sel)]
+        f = hf[hf["week"].isin(sel)]
         st.caption(
-            f"{len(f):,} recipe-rows across {f['iso_week'].nunique()} week(s) · "
+            f"{len(f):,} recipe-rows across {f['week'].nunique()} week(s) · "
             f"{f['recipe_title'].nunique():,} unique recipes"
         )
-        show = f[["iso_week", "slot_number", "recipe_title",
+        show = f[["week", "slot_number", "recipe_title",
                   "kcal_per_serving", "kj_per_serving", "grams_per_serving"]].copy()
         show["kcal_per_serving"] = show["kcal_per_serving"].round(0)
         show["kj_per_serving"] = show["kj_per_serving"].round(0)
         show["grams_per_serving"] = show["grams_per_serving"].round(1)
         st.dataframe(
-            show.sort_values(["iso_week", "slot_number"], ascending=[False, True]),
+            show.sort_values(["week", "slot_number"], ascending=[False, True]),
             use_container_width=True, hide_index=True,
         )
         st.download_button(
@@ -199,21 +202,21 @@ with tab3:
         st.stop()
 
     rows = []
-    for week in sorted(prices["iso_week"].unique()):
+    for week in sorted(prices["week"].unique()):
         for brand in ("Gousto", "HelloFresh"):
-            pr = prices[(prices["iso_week"] == week) & (prices["brand"] == brand)]
+            pr = prices[(prices["week"] == week) & (prices["brand"] == brand)]
             if pr.empty:
                 continue
             box_price = pr["box_price"].iloc[0]
             if brand == "Gousto":
-                m = gousto[gousto["iso_week"] == week]
+                m = gousto[gousto["week"] == week]
                 if m.empty:
                     continue
                 avg_kcal = m["kcal_per_portion"].mean()
                 avg_grams = m["portion_weight_g"].mean()
                 n_recipes = len(m)
             else:
-                m = hf[hf["iso_week"] == week]
+                m = hf[hf["week"] == week]
                 if m.empty:
                     continue
                 avg_kcal = m["kcal_per_serving"].mean()
@@ -221,7 +224,7 @@ with tab3:
                 n_recipes = len(m)
             pps = box_price / SERVINGS_PER_BOX
             rows.append({
-                "iso_week": week,
+                "week": week,
                 "brand": brand,
                 "box_price": box_price,
                 "Per serving": pps,
@@ -242,15 +245,15 @@ with tab3:
 
     metrics = ["Per serving", "Per 100 cal", "Per 100g"]
     long = summary.melt(
-        id_vars=["iso_week", "brand"],
+        id_vars=["week", "brand"],
         value_vars=metrics,
         var_name="metric", value_name="value",
     )
 
     # Δ% (HelloFresh vs Gousto) per (week, metric)
     delta_rows = []
-    for week in sorted(summary["iso_week"].unique()):
-        wdf = summary[summary["iso_week"] == week].set_index("brand")
+    for week in sorted(summary["week"].unique()):
+        wdf = summary[summary["week"] == week].set_index("brand")
         if "Gousto" not in wdf.index or "HelloFresh" not in wdf.index:
             continue
         for metric in metrics:
@@ -258,13 +261,13 @@ with tab3:
             hv = wdf.loc["HelloFresh", metric]
             if pd.notna(gv) and pd.notna(hv) and gv:
                 delta_rows.append({
-                    "iso_week": week, "metric": metric,
+                    "week": week, "metric": metric,
                     "delta": (hv - gv) / gv,
                 })
     delta_df = pd.DataFrame(delta_rows)
 
     # Merge delta into long-form so layer + facet share one data source
-    combined = long.merge(delta_df, on=["iso_week", "metric"], how="left")
+    combined = long.merge(delta_df, on=["week", "metric"], how="left")
     combined["label"] = combined.apply(
         lambda r: f"{r['delta']:+.1%}"
         if (r["brand"] == "HelloFresh" and pd.notna(r["delta"]))
@@ -281,13 +284,13 @@ with tab3:
     )
 
     bar = alt.Chart().mark_bar().encode(
-        x=alt.X("iso_week:N", title=None, axis=alt.Axis(labelAngle=0)),
+        x=alt.X("week:N", title=None, axis=alt.Axis(labelAngle=0)),
         xOffset=alt.XOffset("brand:N", sort=["Gousto", "HelloFresh"]),
         y=alt.Y("value:Q", title=None, axis=alt.Axis(format="£.2f")),
         color=alt.Color("brand:N", scale=color_scale, title=None,
                         sort=["Gousto", "HelloFresh"]),
         tooltip=[
-            alt.Tooltip("iso_week:N", title="Week"),
+            alt.Tooltip("week:N", title="Week"),
             alt.Tooltip("brand:N", title="Brand"),
             alt.Tooltip("metric:N"),
             alt.Tooltip("value:Q", title="£", format=".4f"),
@@ -299,7 +302,7 @@ with tab3:
         .mark_text(dy=-8, fontWeight="bold", fontSize=11)
         .transform_filter(alt.datum.brand == "HelloFresh")
         .encode(
-            x=alt.X("iso_week:N"),
+            x=alt.X("week:N"),
             xOffset=alt.value(8),
             y=alt.Y("value:Q"),
             text="label:N",
@@ -326,7 +329,7 @@ with tab3:
     # Δ% summary table
     if not delta_df.empty:
         delta_table = (
-            delta_df.pivot(index="metric", columns="iso_week", values="delta")
+            delta_df.pivot(index="metric", columns="week", values="delta")
             .reindex(metrics)
         )
 
