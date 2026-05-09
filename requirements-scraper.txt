@@ -1,5 +1,6 @@
 selenium-wire
 blinker==1.7.0
 setuptools<81
+pyOpenSSL<24
 webdriver-manager
 requests
