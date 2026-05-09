@@ -285,57 +285,63 @@ with tab3:
 
     y_max = max(4.0, float(combined["value"].max()) * 1.15)
 
-    bar = alt.Chart().mark_bar(size=28).encode(
-        x=alt.X("week:N", title=None,
-                axis=alt.Axis(labelAngle=0, labelFontSize=12, labelPadding=8)),
-        xOffset=alt.XOffset("brand:N", sort=["Gousto", "HelloFresh"]),
-        y=alt.Y(
-            "value:Q", title=None,
-            scale=alt.Scale(domain=[0, y_max]),
-            axis=alt.Axis(format="£.2f", tickCount=9, gridOpacity=0.4),
-        ),
-        color=alt.Color(
-            "brand:N",
-            scale=color_scale,
-            sort=["Gousto", "HelloFresh"],
-            legend=alt.Legend(title=None, orient="top", direction="horizontal",
-                              symbolType="square", symbolSize=180),
-        ),
-        tooltip=[
-            alt.Tooltip("week:N", title="Week"),
-            alt.Tooltip("brand:N", title="Brand"),
-            alt.Tooltip("metric:N"),
-            alt.Tooltip("value:Q", title="£", format=".4f"),
-        ],
-    )
+    def panel_chart(metric_name, show_y_axis, show_legend):
+        df_metric = combined[combined["metric"] == metric_name]
+        df_text = df_metric[df_metric["brand"] == "HelloFresh"].copy()
 
-    text = (
-        alt.Chart()
-        .mark_text(dy=-10, fontWeight="bold", fontSize=12)
-        .transform_filter(alt.datum.brand == "HelloFresh")
-        .encode(
-            x=alt.X("week:N"),
-            xOffset=alt.value(8),
-            y=alt.Y("value:Q"),
-            text="label:N",
-            color=alt.Color("label_color:N", scale=None, legend=None),
+        bar = (
+            alt.Chart(df_metric)
+            .mark_bar(size=28)
+            .encode(
+                x=alt.X("week:N", title=None,
+                        axis=alt.Axis(labelAngle=0, labelFontSize=12, labelPadding=8)),
+                xOffset=alt.XOffset("brand:N", sort=["Gousto", "HelloFresh"]),
+                y=alt.Y(
+                    "value:Q",
+                    title=None,
+                    scale=alt.Scale(domain=[0, y_max]),
+                    axis=alt.Axis(format="£.2f", tickCount=9, gridOpacity=0.4)
+                    if show_y_axis else None,
+                ),
+                color=alt.Color(
+                    "brand:N", scale=color_scale,
+                    sort=["Gousto", "HelloFresh"],
+                    legend=alt.Legend(
+                        title=None, orient="top", direction="horizontal",
+                        symbolType="square", symbolSize=180,
+                    ) if show_legend else None,
+                ),
+                tooltip=[
+                    alt.Tooltip("week:N", title="Week"),
+                    alt.Tooltip("brand:N", title="Brand"),
+                    alt.Tooltip("value:Q", title="£", format=".4f"),
+                ],
+            )
         )
-    )
+        text = (
+            alt.Chart(df_text)
+            .mark_text(dy=-10, fontWeight="bold", fontSize=12)
+            .encode(
+                x=alt.X("week:N"),
+                xOffset=alt.value(8),
+                y=alt.Y("value:Q"),
+                text="label:N",
+                color=alt.Color("label_color:N", scale=None, legend=None),
+            )
+        )
+        return (bar + text).properties(
+            title=alt.TitleParams(metric_name, anchor="middle",
+                                  fontSize=15, fontWeight="bold", color="#444"),
+            height=420,
+        )
 
+    panels = [panel_chart(m, i == 0, i == 0) for i, m in enumerate(metrics)]
     chart = (
-        alt.layer(bar, text, data=combined)
-        .properties(height=420, title=alt.TitleParams(
+        alt.hconcat(*panels, spacing=40)
+        .properties(title=alt.TitleParams(
             "Δ% = HelloFresh vs Gousto", anchor="end",
             fontSize=12, color="#777", dy=-8,
         ))
-        .facet(
-            column=alt.Column(
-                "metric:N", title=None, sort=metrics,
-                header=alt.Header(labelFontSize=15, labelFontWeight="bold",
-                                  labelPadding=10, labelColor="#444"),
-            ),
-            spacing=40,
-        )
     )
 
     st.altair_chart(chart, use_container_width=True)
