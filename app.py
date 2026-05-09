@@ -285,32 +285,41 @@ with tab3:
 
     y_max = max(4.0, float(combined["value"].max()) * 1.15)
 
-    def panel_chart(metric_name, show_y_axis, show_legend):
-        df_metric = combined[combined["metric"] == metric_name]
-        df_text = df_metric[df_metric["brand"] == "HelloFresh"].copy()
+    # Top row: legend on left, "Δ% = HelloFresh vs Gousto" annotation on right
+    legend_col, _, hint_col = st.columns([2, 4, 2])
+    with legend_col:
+        st.markdown(
+            f"<span style='display:inline-block;width:14px;height:14px;background:{GOUSTO_COLOR};margin-right:6px;vertical-align:middle'></span>"
+            f"<b>Gousto</b>"
+            f"&nbsp;&nbsp;&nbsp;<span style='display:inline-block;width:14px;height:14px;background:{HF_COLOR};margin-right:6px;vertical-align:middle'></span>"
+            f"<b>HelloFresh</b>",
+            unsafe_allow_html=True,
+        )
+    with hint_col:
+        st.markdown(
+            "<div style='text-align:right;color:#777;font-size:13px'>Δ% = HelloFresh vs Gousto</div>",
+            unsafe_allow_html=True,
+        )
+
+    panel_cols = st.columns(len(metrics))
+    for col, metric_name in zip(panel_cols, metrics):
+        df_m = combined[combined["metric"] == metric_name].copy()
+        df_text = df_m[df_m["brand"] == "HelloFresh"].copy()
 
         bar = (
-            alt.Chart(df_metric)
-            .mark_bar(size=28)
+            alt.Chart(df_m)
+            .mark_bar(size=22)
             .encode(
                 x=alt.X("week:N", title=None,
-                        axis=alt.Axis(labelAngle=0, labelFontSize=12, labelPadding=8)),
+                        axis=alt.Axis(labelAngle=0, labelFontSize=12)),
                 xOffset=alt.XOffset("brand:N", sort=["Gousto", "HelloFresh"]),
                 y=alt.Y(
-                    "value:Q",
-                    title=None,
+                    "value:Q", title=None,
                     scale=alt.Scale(domain=[0, y_max]),
-                    axis=alt.Axis(format="£.2f", tickCount=9, gridOpacity=0.4)
-                    if show_y_axis else None,
+                    axis=alt.Axis(format="£.2f", tickCount=9, gridOpacity=0.4),
                 ),
-                color=alt.Color(
-                    "brand:N", scale=color_scale,
-                    sort=["Gousto", "HelloFresh"],
-                    legend=alt.Legend(
-                        title=None, orient="top", direction="horizontal",
-                        symbolType="square", symbolSize=180,
-                    ) if show_legend else None,
-                ),
+                color=alt.Color("brand:N", scale=color_scale,
+                                sort=["Gousto", "HelloFresh"], legend=None),
                 tooltip=[
                     alt.Tooltip("week:N", title="Week"),
                     alt.Tooltip("brand:N", title="Brand"),
@@ -320,31 +329,22 @@ with tab3:
         )
         text = (
             alt.Chart(df_text)
-            .mark_text(dy=-10, fontWeight="bold", fontSize=12)
+            .mark_text(dy=-10, fontWeight="bold", fontSize=11)
             .encode(
                 x=alt.X("week:N"),
-                xOffset=alt.value(8),
+                xOffset=alt.value(6),
                 y=alt.Y("value:Q"),
                 text="label:N",
                 color=alt.Color("label_color:N", scale=None, legend=None),
             )
         )
-        return (bar + text).properties(
-            title=alt.TitleParams(metric_name, anchor="middle",
-                                  fontSize=15, fontWeight="bold", color="#444"),
-            height=420,
-        )
-
-    panels = [panel_chart(m, i == 0, i == 0) for i, m in enumerate(metrics)]
-    chart = (
-        alt.hconcat(*panels, spacing=40)
-        .properties(title=alt.TitleParams(
-            "Δ% = HelloFresh vs Gousto", anchor="end",
-            fontSize=12, color="#777", dy=-8,
-        ))
-    )
-
-    st.altair_chart(chart, use_container_width=True)
+        panel = (bar + text).properties(height=380)
+        with col:
+            st.markdown(
+                f"<div style='text-align:center;font-weight:bold;font-size:15px;color:#444;margin-bottom:6px'>{metric_name}</div>",
+                unsafe_allow_html=True,
+            )
+            st.altair_chart(panel, use_container_width=True)
 
     # Δ% summary table
     if not delta_df.empty:
