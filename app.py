@@ -500,8 +500,8 @@ with st.sidebar:
     st.markdown(
         "**Price per 100 kcal** \n"
         "`= Price per serving ÷ (avg kcal per serving ÷ 100)`  \n"
-        "*Avg kcal per serving* is the mean across every recipe on that "
-        "week's menu (≈ 270–350 recipes for Gousto, ≈ 70 for HelloFresh)."
+        "*Avg kcal per serving* is the mean across every recipe shown on "
+        "that brand's customer-facing menu for the week."
     )
     st.markdown(
         "**Price per 100g** \n"
