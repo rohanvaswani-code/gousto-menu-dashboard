@@ -1,6 +1,6 @@
 """
 Gousto UK Menu Scraper - local Windows port.
-Fetches this week's menu plus the next two weeks (4-portion box).
+Fetches this week's menu plus the next three weeks (4-portion box).
 Writes one CSV per week into ./data. Re-running a week overwrites that week's file
 (latest snapshot wins per menu_week_start).
 """
@@ -22,7 +22,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 # -------------------- CONFIG --------------------
 NUM_PORTIONS = 4
-WEEKS_TO_FETCH = [0, 1, 2]
+WEEKS_TO_FETCH = [0, 1, 2, 3]
 SCRIPT_DIR = Path(__file__).resolve().parent
 OUTPUT_DIR = SCRIPT_DIR / "data"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -97,14 +97,14 @@ def fetch_menu(session, url_template, delivery_date, num_portions):
     data = r.json()
     all_recipes = data.get("recipes", {})
 
-    # Filter to the customer-facing "All Recipes" category — matches what users
-    # see on gousto.co.uk/menu (~189). The full `recipes` dict (~271) includes
-    # sub-category-only items like Health Hub / Desserts & Sides / Premium.
+    # Customer-facing menu = the `all-recipes` category. The raw `recipes` dict
+    # also includes sub-category-only items (Health Hub / Desserts & Sides /
+    # Premium) that don't appear on gousto.co.uk/menu, so we MUST filter.
+    # Fail loudly if the category is missing — silent fallback would ship ~271
+    # rows when the website only shows ~189.
     categories = data.get("categories", {})
-    if isinstance(categories, dict):
-        cats_iter = categories.values()
-    else:
-        cats_iter = categories
+    cats_iter = categories.values() if isinstance(categories, dict) else categories
+
     visible_ids = None
     for c in cats_iter:
         if isinstance(c, dict) and c.get("slug") == "all-recipes":
@@ -119,12 +119,15 @@ def fetch_menu(session, url_template, delivery_date, num_portions):
             visible_ids = set(ids)
             break
 
-    if visible_ids:
-        recipes = {rid: r for rid, r in all_recipes.items() if rid in visible_ids}
-        print(f"   filtered to 'all-recipes' category: {len(recipes)} (was {len(all_recipes)})")
-    else:
-        recipes = all_recipes
-        print(f"   no 'all-recipes' category found — keeping all {len(all_recipes)}")
+    if not visible_ids:
+        raise RuntimeError(
+            f"'all-recipes' category missing or empty for delivery_date={delivery_date}. "
+            f"Refusing to write unfiltered menu ({len(all_recipes)} recipes) — "
+            f"the customer-facing menu is much smaller. Check Gousto API response shape."
+        )
+
+    recipes = {rid: r for rid, r in all_recipes.items() if rid in visible_ids}
+    print(f"   filtered to 'all-recipes' category: {len(recipes)} (was {len(all_recipes)})")
     return recipes, data.get("period", {})
 
 
@@ -288,7 +291,7 @@ def scrape_week(session, url_template, weeks_ahead, uuid_to_slug, num_portions, 
     print(f"   {len(menu_recipes)} recipes on this menu")
 
     if not menu_recipes:
-        return None
+        return None, week_start, 0
 
     rows = []
     matched = 0
@@ -307,7 +310,7 @@ def scrape_week(session, url_template, weeks_ahead, uuid_to_slug, num_portions, 
     out_path = OUTPUT_DIR / f"gousto_menu_{week_start}_{scraped_at}.csv"
     write_csv(rows, out_path)
     print(f"   per-100g coverage: {matched}/{total} ({matched/total*100:.0f}%)")
-    return out_path
+    return out_path, week_start, total
 
 
 def run():
@@ -319,17 +322,33 @@ def run():
     uuid_to_slug = build_uuid_to_slug_map(session, use_cache=True)
 
     csv_paths = []
+    week_counts = []
+    failures = []
     for wk in WEEKS_TO_FETCH:
         try:
-            path = scrape_week(session, url_template, wk, uuid_to_slug, NUM_PORTIONS, scraped_at)
+            path, week_start, count = scrape_week(
+                session, url_template, wk, uuid_to_slug, NUM_PORTIONS, scraped_at
+            )
             if path:
                 csv_paths.append(path)
+                week_counts.append((week_start, count))
         except Exception as e:
             print(f"   FAILED week +{wk}: {e}")
+            failures.append((wk, str(e)))
 
     print(f"\n{'='*60}\nDONE: {len(csv_paths)} CSV(s) created\n{'='*60}")
     for p in csv_paths:
         print(f"  {p}")
+
+    print(f"\n{'='*60}\nPER-WEEK FILTERED COUNTS (compare to gousto.co.uk/menu)\n{'='*60}")
+    for week_start, count in week_counts:
+        print(f"  {week_start}  ->  {count} recipes")
+    if failures:
+        print(f"\n{'='*60}\nFAILURES\n{'='*60}")
+        for wk, msg in failures:
+            print(f"  week +{wk}: {msg}")
+        raise RuntimeError(f"{len(failures)} week(s) failed")
+
     return csv_paths
 
 
