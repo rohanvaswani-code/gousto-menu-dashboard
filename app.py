@@ -55,9 +55,12 @@ def load_gousto():
     df = pd.concat(frames, ignore_index=True)
     if "scraped_at" in df.columns:
         df["scraped_at"] = pd.to_datetime(df["scraped_at"], errors="coerce")
-        df = df.sort_values("scraped_at").drop_duplicates(
-            subset=["menu_week_start", "id"], keep="last"
-        )
+        # For each menu_week_start keep ONLY rows from the latest scrape — drop
+        # earlier snapshots entirely. Row-level dedup on (week, id) would let
+        # rows that exist only in older snapshots (e.g. pre-filter sub-category
+        # items) survive and inflate the count.
+        latest = df.groupby("menu_week_start")["scraped_at"].transform("max")
+        df = df[df["scraped_at"] == latest]
     df["menu_week_start"] = df["menu_week_start"].astype(str)
     df["week"] = df["menu_week_start"].apply(to_week)
     for c in [
