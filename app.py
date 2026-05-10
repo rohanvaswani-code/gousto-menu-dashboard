@@ -182,8 +182,10 @@ gousto_all = load_gousto()
 hf_all = load_hellofresh()
 prices_all = load_prices()
 
-# Determine the latest 3 weeks present anywhere in the data — that's the
-# dashboard's rolling window. Older snapshots remain in data/ for analysis.
+# The 3-week rolling window is now ONLY applied to the pricing-tab bar charts +
+# Δ% summary. Every other surface (underlying numbers tables, historic trends,
+# HelloFresh recipes, Gousto recipes) shows the full history so older weeks
+# are preserved as new ones land.
 all_weeks = sorted(
     set(gousto_all.get("week", pd.Series(dtype=str)).dropna()) |
     set(hf_all.get("week", pd.Series(dtype=str)).dropna()) |
@@ -191,9 +193,13 @@ all_weeks = sorted(
 )
 visible_weeks = all_weeks[-3:] if len(all_weeks) >= 3 else all_weeks
 
-gousto = gousto_all[gousto_all["week"].isin(visible_weeks)] if not gousto_all.empty else gousto_all
-hf = hf_all[hf_all["week"].isin(visible_weeks)] if not hf_all.empty else hf_all
-prices = prices_all[prices_all["week"].isin(visible_weeks)] if not prices_all.empty else prices_all
+gousto_window = gousto_all[gousto_all["week"].isin(visible_weeks)] if not gousto_all.empty else gousto_all
+hf_window = hf_all[hf_all["week"].isin(visible_weeks)] if not hf_all.empty else hf_all
+prices_window = prices_all[prices_all["week"].isin(visible_weeks)] if not prices_all.empty else prices_all
+
+# Pre-compute both metric tables once so every tab can pull whichever it needs.
+summary_window = compute_weekly_metrics(gousto_window, hf_window, prices_window)
+summary_full = compute_weekly_metrics(gousto_all, hf_all, prices_all)
 
 logo_candidates = [ASSETS_DIR / "hellofresh_logo.png",
                    ASSETS_DIR / "hellofresh_logo.svg",
@@ -215,7 +221,7 @@ if logo_path is not None:
 else:
     st.title("Menu Miner 1.0 — Gousto vs HelloFresh Menu Dashboard")
 
-if gousto.empty and hf.empty:
+if gousto_all.empty and hf_all.empty:
     st.warning(
         "No data yet. Drop Gousto CSVs into `data/`, HelloFresh CSVs into "
         "`data/hellofresh/`, and pricing CSVs into `data/prices/`."
@@ -237,7 +243,7 @@ tab_pricing, tab_trends, tab_hf, tab_gousto = st.tabs([
 with tab_pricing:
     st.header(f"Weekly pricing comparison — {NUM_PORTIONS} people × {MEALS_PER_BOX} meals box")
 
-    if prices.empty:
+    if prices_all.empty:
         st.warning(
             "No pricing data yet. Drop a CSV into `data/prices/` named e.g. "
             "`prices_2026-W19.csv` with header `Gousto,HelloFresh` and one row of "
@@ -245,15 +251,14 @@ with tab_pricing:
         )
         st.stop()
 
-    summary = compute_weekly_metrics(gousto, hf, prices)
-    if summary.empty:
+    if summary_window.empty:
         st.info(
             "Pricing CSVs found, but no matching menu data for those weeks. "
             "Make sure the Gousto + HelloFresh CSVs cover the same weeks."
         )
         st.stop()
 
-    delta_df = compute_deltas(summary, METRICS)
+    delta_df = compute_deltas(summary_window, METRICS)
 
     # Shared legend + Δ% caption above the three panels
     legend_col, _, hint_col = st.columns([2, 4, 2])
@@ -274,7 +279,7 @@ with tab_pricing:
 
     panel_cols = st.columns(len(METRICS))
     for col, metric_name in zip(panel_cols, METRICS):
-        df_m = summary.copy()
+        df_m = summary_window.copy()
         weeks_sorted = sorted(df_m["week"].unique())
         max_val = float(df_m[metric_name].max())
         y_max = max_val * 1.20 if max_val > 0 else 1.0
@@ -336,8 +341,8 @@ with tab_pricing:
             use_container_width=True,
         )
 
-    with st.expander("Underlying numbers"):
-        disp = summary.copy()
+    with st.expander("Underlying numbers (full history — appends every week)"):
+        disp = summary_full.copy()
         for c in ("box_price", "Per serving", "Per 100 cal", "Per 100g"):
             if c in disp.columns:
                 disp[c] = disp[c].apply(
@@ -347,7 +352,8 @@ with tab_pricing:
             if c in disp.columns:
                 disp[c] = disp[c].round(1)
         st.dataframe(
-            disp.rename(columns={"week": "hellofresh_week"}),
+            disp.sort_values(["week", "brand"])
+                .rename(columns={"week": "hellofresh_week"}),
             use_container_width=True, hide_index=True,
         )
 
@@ -356,7 +362,7 @@ with tab_pricing:
 with tab_trends:
     st.header("Historic price trends")
 
-    full_summary = compute_weekly_metrics(gousto_all, hf_all, prices_all)
+    full_summary = summary_full
     if full_summary.empty:
         st.info(
             "Not enough data yet. Need at least one week with all three sources "
@@ -416,15 +422,15 @@ with tab_trends:
                 use_container_width=True, hide_index=True,
             )
 
-# -------------------- TAB: HELLOFRESH --------------------
+# -------------------- TAB: HELLOFRESH (full history) --------------------
 with tab_hf:
     st.header("HelloFresh recipes by week")
-    if hf.empty:
+    if hf_all.empty:
         st.info("No HelloFresh data yet. Drop CSVs into `data/hellofresh/`.")
     else:
-        weeks = sorted(hf["week"].unique(), reverse=True)
+        weeks = sorted(hf_all["week"].unique(), reverse=True)
         sel = st.multiselect("HelloFresh week(s)", weeks, default=weeks, key="hf_weeks")
-        f = hf[hf["week"].isin(sel)]
+        f = hf_all[hf_all["week"].isin(sel)]
         st.caption(
             f"{len(f):,} recipe-rows across {f['week'].nunique()} HelloFresh week(s) · "
             f"{f['recipe_title'].nunique():,} unique recipes"
@@ -445,15 +451,15 @@ with tab_hf:
             "hellofresh_filtered.csv", "text/csv",
         )
 
-# -------------------- TAB: GOUSTO --------------------
+# -------------------- TAB: GOUSTO (full history) --------------------
 with tab_gousto:
     st.header("Gousto recipes by week")
-    if gousto.empty:
+    if gousto_all.empty:
         st.info("No Gousto data yet.")
     else:
-        weeks = sorted(gousto["week"].unique(), reverse=True)
+        weeks = sorted(gousto_all["week"].unique(), reverse=True)
         sel = st.multiselect("HelloFresh week(s)", weeks, default=weeks, key="g_weeks")
-        f = gousto[gousto["week"].isin(sel)].copy()
+        f = gousto_all[gousto_all["week"].isin(sel)].copy()
         # Format menu_week_start as DD/MM/YYYY
         f["menu_date"] = pd.to_datetime(f["menu_week_start"], errors="coerce").dt.strftime("%d/%m/%Y")
         st.caption(
@@ -524,7 +530,10 @@ with st.sidebar:
         "- **Box prices**: manual weekly entry from each website"
     )
     st.caption(
-        "The dashboard's *Pricing comparison* and *recipes* tabs show the latest "
-        "**3 weeks** (current + next two). The *Historic trends* tab grows over "
-        "time as new weeks are added."
+        "The bar charts and Δ% table on *Pricing comparison* show the rolling "
+        "**3-week window** (current + next two). Every other surface — "
+        "*Historic trends*, *HelloFresh recipes*, *Gousto recipes*, and the "
+        "*Underlying numbers* expander — shows the **full history** and grows "
+        "each week as new data is added. Older weekly CSVs are preserved in the "
+        "GitHub repo and downloadable any time."
     )
