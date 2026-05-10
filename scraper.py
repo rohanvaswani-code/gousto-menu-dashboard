@@ -1,6 +1,6 @@
 """
 Gousto UK Menu Scraper - local Windows port.
-Fetches this week's menu plus the next three weeks (4-portion box).
+Fetches this week's menu plus the next two weeks (4-portion box).
 Writes one CSV per week into ./data. Re-running a week overwrites that week's file
 (latest snapshot wins per menu_week_start).
 """
@@ -22,7 +22,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 # -------------------- CONFIG --------------------
 NUM_PORTIONS = 4
-WEEKS_TO_FETCH = [0, 1, 2, 3]
+WEEKS_TO_FETCH = [0, 1, 2]
 SCRIPT_DIR = Path(__file__).resolve().parent
 OUTPUT_DIR = SCRIPT_DIR / "data"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
