@@ -191,7 +191,17 @@ all_weeks = sorted(
     set(hf_all.get("week", pd.Series(dtype=str)).dropna()) |
     set(prices_all.get("week", pd.Series(dtype=str)).dropna())
 )
-visible_weeks = all_weeks[-3:] if len(all_weeks) >= 3 else all_weeks
+# Only put a week on the 3-week pricing window once it has Gousto + HF +
+# price together. Otherwise we end up flipping to a week (e.g. W22 after
+# Tuesday's HF/price upload) where Gousto hasn't scraped yet and the pricing
+# tab tries to compute deltas against missing data.
+gousto_weeks = set(gousto_all.get("week", pd.Series(dtype=str)).dropna())
+hf_weeks = set(hf_all.get("week", pd.Series(dtype=str)).dropna())
+price_weeks = set(prices_all.get("week", pd.Series(dtype=str)).dropna())
+comparable_weeks = sorted(gousto_weeks & hf_weeks & price_weeks)
+visible_weeks = comparable_weeks[-3:] if len(comparable_weeks) >= 3 else comparable_weeks
+if not visible_weeks:
+    visible_weeks = all_weeks[-3:]  # last-ditch fallback for the empty-state warning
 
 gousto_window = gousto_all[gousto_all["week"].isin(visible_weeks)] if not gousto_all.empty else gousto_all
 hf_window = hf_all[hf_all["week"].isin(visible_weeks)] if not hf_all.empty else hf_all
@@ -294,8 +304,12 @@ with tab_pricing:
                 hovertemplate=f"%{{x}}<br>{brand}: £%{{y:.2f}}<extra></extra>",
             ))
 
-        # Δ% annotation above each HF bar
-        for _, r in df_m[df_m["brand"] == "HelloFresh"].iterrows():
+        # Δ% annotation above each HF bar (skip if no comparable deltas)
+        if delta_df.empty or "week" not in delta_df.columns:
+            iter_rows = iter(())
+        else:
+            iter_rows = df_m[df_m["brand"] == "HelloFresh"].iterrows()
+        for _, r in iter_rows:
             d_row = delta_df[(delta_df["week"] == r["week"]) &
                              (delta_df["metric"] == metric_name)]
             if d_row.empty:
