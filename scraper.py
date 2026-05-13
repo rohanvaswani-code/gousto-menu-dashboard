@@ -281,7 +281,15 @@ def write_csv(rows, path):
 
 # -------------------- TOP-LEVEL --------------------
 def scrape_week(session, url_template, weeks_ahead, uuid_to_slug, num_portions, scraped_at):
-    target = date.today() + timedelta(days=max(weeks_ahead * 7, 2))
+    # Gousto's menu API returns the menu with the latest cutoff <= delivery_date,
+    # not the menu containing it. Cutoffs are on Tuesdays. Anchor each week's
+    # delivery_date to the next Tuesday strictly after today (the cutoff of the
+    # currently-live menu), then step 7 days per weeks_ahead. This makes
+    # weeks_ahead=0 always return the menu users are currently ordering from,
+    # regardless of what day of the week the scraper runs.
+    today = date.today()
+    days_to_next_tue = (1 - today.weekday()) % 7 or 7  # weekday: Mon=0..Sun=6
+    target = today + timedelta(days=days_to_next_tue + weeks_ahead * 7)
     delivery_date = target.isoformat()
     print(f"\n--- Week +{weeks_ahead}: requesting delivery_date={delivery_date} ---")
 
