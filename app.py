@@ -42,8 +42,19 @@ def to_week(d):
         return ""
 
 
-@st.cache_data
-def load_gousto():
+def _fingerprint(root: Path, pattern: str) -> tuple:
+    """A tiny hashable summary of every matching file so cache_data invalidates
+    the moment any CSV is added / removed / modified (e.g. via a fresh GitHub
+    Action commit landing on Streamlit Cloud). Without this the @st.cache_data
+    holds stale dataframes until the process restarts."""
+    if not root.exists():
+        return ()
+    return tuple(sorted((f.name, f.stat().st_mtime, f.stat().st_size)
+                        for f in root.glob(pattern)))
+
+
+@st.cache_data(ttl=600)
+def load_gousto(fingerprint=None):
     files = sorted(DATA_DIR.glob("gousto_menu_*.csv"))
     if not files:
         return pd.DataFrame()
@@ -73,8 +84,8 @@ def load_gousto():
     return df
 
 
-@st.cache_data
-def load_hellofresh():
+@st.cache_data(ttl=600)
+def load_hellofresh(fingerprint=None):
     if not HF_DIR.exists():
         return pd.DataFrame()
     files = sorted(HF_DIR.glob("*.csv"))
@@ -91,8 +102,8 @@ def load_hellofresh():
     return df
 
 
-@st.cache_data
-def load_prices():
+@st.cache_data(ttl=600)
+def load_prices(fingerprint=None):
     """Return long-form: rows of (week, brand, box_price)."""
     if not PRICES_DIR.exists():
         return pd.DataFrame(columns=["week", "brand", "box_price"])
@@ -178,9 +189,12 @@ def compute_deltas(summary_df, metrics):
 
 
 # -------------------- LOAD --------------------
-gousto_all = load_gousto()
-hf_all = load_hellofresh()
-prices_all = load_prices()
+# Pass file fingerprints so @st.cache_data automatically invalidates whenever
+# a CSV is added/modified (e.g. the Wednesday auto-scrape commit). Also a
+# 10-minute TTL as a belt-and-braces fallback.
+gousto_all = load_gousto(_fingerprint(DATA_DIR, "gousto_menu_*.csv"))
+hf_all = load_hellofresh(_fingerprint(HF_DIR, "*.csv"))
+prices_all = load_prices(_fingerprint(PRICES_DIR, "*.csv"))
 
 # The 3-week rolling window is now ONLY applied to the pricing-tab bar charts +
 # Δ% summary. Every other surface (underlying numbers tables, historic trends,
