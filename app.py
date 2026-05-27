@@ -88,12 +88,17 @@ def load_gousto(fingerprint=None):
 def load_hellofresh(fingerprint=None):
     if not HF_DIR.exists():
         return pd.DataFrame()
-    files = sorted(HF_DIR.glob("*.csv"))
+    # Sort by file mtime ascending so the LATEST upload's rows appear last in
+    # the concat — then drop_duplicates(keep="last") keeps them. Dedupe key is
+    # (week, slot_number) only: if the same slot appears in two uploads with
+    # different recipe_titles (menu was edited between exports), the newer
+    # upload wins per slot. Prevents inflated per-week counts when files overlap.
+    files = sorted(HF_DIR.glob("*.csv"), key=lambda p: p.stat().st_mtime)
     if not files:
         return pd.DataFrame()
     frames = [pd.read_csv(f) for f in files]
     df = pd.concat(frames, ignore_index=True)
-    df = df.drop_duplicates(subset=["week", "slot_number", "recipe_title"], keep="last")
+    df = df.drop_duplicates(subset=["week", "slot_number"], keep="last")
     # CSV's `calories` column is kJ per serving (per HF labelling); convert to kcal.
     df["kj_per_serving"] = pd.to_numeric(df["calories"], errors="coerce")
     df["kcal_per_serving"] = df["kj_per_serving"] / KJ_PER_KCAL
