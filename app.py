@@ -78,9 +78,21 @@ def load_gousto(fingerprint=None):
         "kcal_per_portion", "portion_weight_g", "protein_g_per_portion",
         "fat_g_per_portion", "carbs_g_per_portion", "fibre_g_per_portion",
         "salt_g_per_portion", "prep_time_min", "rating_avg", "rating_count",
+        "surcharge_per_portion_gbp",
     ]:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    # Derive a presentation-friendly tier label. CSVs scraped before May 2026
+    # don't carry surcharge data; mark those as "Unknown" rather than misleading
+    # the user into thinking everything is "Core".
+    if "is_surcharge" in df.columns:
+        df["tier"] = df["is_surcharge"].map({True: "Premium", False: "Core"})
+        df["tier"] = df["tier"].fillna("Unknown")
+    else:
+        df["tier"] = "Unknown"
+        df["is_surcharge"] = pd.NA
+        df["surcharge_per_portion_gbp"] = pd.NA
     return df
 
 
@@ -491,25 +503,46 @@ with tab_gousto:
         st.info("No Gousto data yet.")
     else:
         weeks = sorted(gousto_all["week"].unique(), reverse=True)
-        sel = st.multiselect("HelloFresh week(s)", weeks, default=weeks, key="g_weeks")
-        f = gousto_all[gousto_all["week"].isin(sel)].copy()
+        col_wk, col_tier = st.columns([3, 1])
+        with col_wk:
+            sel = st.multiselect("HelloFresh week(s)", weeks, default=weeks, key="g_weeks")
+        # Build tier options dynamically — only show "Unknown" if any rows lack data
+        available_tiers = sorted(gousto_all["tier"].dropna().unique().tolist())
+        with col_tier:
+            tier_sel = st.multiselect(
+                "Tier", available_tiers, default=available_tiers, key="g_tier",
+                help="Premium = recipes with a surcharge (+£X/portion). "
+                     "Core = no surcharge — what the £67.98 box buys.",
+            )
+        f = gousto_all[gousto_all["week"].isin(sel) & gousto_all["tier"].isin(tier_sel)].copy()
         # Format menu_week_start as DD/MM/YYYY
         f["menu_date"] = pd.to_datetime(f["menu_week_start"], errors="coerce").dt.strftime("%d/%m/%Y")
+        # Tier-specific caption
+        n_core = (f["tier"] == "Core").sum()
+        n_prem = (f["tier"] == "Premium").sum()
+        n_unk = (f["tier"] == "Unknown").sum()
+        tier_breakdown = f"**{n_core:,} Core**, **{n_prem:,} Premium**"
+        if n_unk:
+            tier_breakdown += f", {n_unk:,} Unknown (older scrapes pre-surcharge tracking)"
         st.caption(
             f"{len(f):,} recipe-rows across {f['week'].nunique()} HelloFresh week(s) · "
-            f"{f['name'].nunique():,} unique recipes"
+            f"{f['name'].nunique():,} unique recipes · {tier_breakdown}"
         )
         cols = [
-            "week", "menu_date", "name", "food_brand",
-            "kcal_per_portion", "portion_weight_g",
+            "week", "menu_date", "name", "tier", "surcharge_per_portion_gbp",
+            "food_brand", "kcal_per_portion", "portion_weight_g",
             "protein_g_per_portion", "fat_g_per_portion",
             "carbs_g_per_portion", "fibre_g_per_portion", "salt_g_per_portion",
             "prep_time_min", "spice_level", "dietary_claims",
             "rating_avg", "rating_count",
         ]
         cols = [c for c in cols if c in f.columns]
-        out = f[cols].sort_values(["week", "name"], ascending=[False, True])
-        out = out.rename(columns={"week": "hellofresh_week"})
+        out = f[cols].sort_values(["week", "tier", "name"],
+                                  ascending=[False, True, True])
+        out = out.rename(columns={
+            "week": "hellofresh_week",
+            "surcharge_per_portion_gbp": "surcharge_£_per_portion",
+        })
         st.dataframe(out, use_container_width=True, hide_index=True)
         st.download_button(
             "Download filtered CSV",

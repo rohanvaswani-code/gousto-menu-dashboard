@@ -233,12 +233,22 @@ def make_row(rid, menu_recipe, detail, week_start, scraped_at):
     if kcal_per_100g == "" and pp.get("net_weight_mg") and pp.get("energy_kcal"):
         kcal_per_100g = round(pp["energy_kcal"] / (pp["net_weight_mg"] / 1000) * 100)
 
+    # Surcharge / "premium recipe" handling. Gousto's surcharge object looks like
+    # {"name": "Premium Recipe Surcharge", "price": 999, "price_per_portion": 250}
+    # — both values in pence. Core recipes have surcharge = null.
+    surcharge_obj = menu_recipe.get("surcharge") or {}
+    surcharge_pence = surcharge_obj.get("price_per_portion") if surcharge_obj else 0
+    surcharge_per_portion_gbp = round((surcharge_pence or 0) / 100, 2)
+    is_surcharge = surcharge_per_portion_gbp > 0
+
     return {
         "menu_week_start": week_start,
         "scraped_at": scraped_at,
         "id": rid,
         "core_recipe_id": menu_recipe.get("core_recipe_id", ""),
         "name": name,
+        "is_surcharge": is_surcharge,
+        "surcharge_per_portion_gbp": surcharge_per_portion_gbp,
         "portion_weight_g": portion_weight_g,
         "kcal_per_portion": pp.get("energy_kcal", ""),
         "protein_g_per_portion": to_g(pp.get("protein_mg")),
