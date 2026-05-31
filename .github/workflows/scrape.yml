@@ -44,7 +44,18 @@ jobs:
           git add data/
           if git diff --quiet --cached; then
             echo "No data changes to commit."
-          else
-            git commit -m "data: weekly scrape $(date -u +%Y-%m-%d)"
-            git push
+            exit 0
           fi
+          git commit -m "data: weekly scrape $(date -u +%Y-%m-%d)"
+          # Retry push with rebase a few times in case another commit
+          # (e.g. a manual code push) landed on main during the scrape.
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "Push succeeded on attempt $attempt"
+              exit 0
+            fi
+            echo "Push rejected — rebasing and retrying (attempt $attempt/5)"
+            git pull --rebase origin main
+          done
+          echo "Push failed after 5 attempts"
+          exit 1
