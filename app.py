@@ -116,6 +116,13 @@ def load_hellofresh(fingerprint=None):
     df["kcal_per_serving"] = df["kj_per_serving"] / KJ_PER_KCAL
     df["grams_per_serving"] = pd.to_numeric(df["grams"], errors="coerce")
     df["week"] = df["week"].astype(str)
+    # Tier mapping: HelloFresh slots 1-71 are core recipes; 72-80 are premium
+    # (surcharge) recipes. This is fixed at the slot-numbering level.
+    slot_num = pd.to_numeric(df["slot_number"], errors="coerce")
+    df["tier"] = slot_num.apply(
+        lambda s: "Premium" if pd.notna(s) and s >= 72 else
+                  ("Core" if pd.notna(s) else "Unknown")
+    )
     return df
 
 
@@ -147,13 +154,23 @@ def load_prices(fingerprint=None):
     return pd.DataFrame(rows)
 
 
-def compute_weekly_metrics(gousto_df, hf_df, prices_df):
+def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total"):
     """For each week with both a Gousto and a HelloFresh menu plus a price,
     compute price-per-serving, price-per-100-cal, price-per-100g.
-    Returns long-form DataFrame with one row per (week, brand)."""
+    Returns long-form DataFrame with one row per (week, brand).
+    `tier` controls which recipes are averaged when computing avg_kcal / avg_grams:
+      - "Total"   : every recipe on the menu (including Unknown for older scrapes)
+      - "Core"    : non-surcharge recipes only
+      - "Premium" : surcharge recipes only"""
     rows = []
     if prices_df.empty:
         return pd.DataFrame(rows)
+
+    def _filter_tier(m_df):
+        if tier == "Total" or "tier" not in m_df.columns:
+            return m_df
+        return m_df[m_df["tier"] == tier]
+
     for week in sorted(prices_df["week"].unique()):
         for brand in ("Gousto", "HelloFresh"):
             pr = prices_df[(prices_df["week"] == week) & (prices_df["brand"] == brand)]
@@ -162,12 +179,14 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df):
             box_price = pr["box_price"].iloc[0]
             if brand == "Gousto":
                 m = gousto_df[gousto_df["week"] == week] if not gousto_df.empty else gousto_df
+                m = _filter_tier(m)
                 if m.empty:
                     continue
                 avg_kcal = m["kcal_per_portion"].mean()
                 avg_grams = m["portion_weight_g"].mean()
             else:
                 m = hf_df[hf_df["week"] == week] if not hf_df.empty else hf_df
+                m = _filter_tier(m)
                 if m.empty:
                     continue
                 avg_kcal = m["kcal_per_serving"].mean()
@@ -176,6 +195,7 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df):
             rows.append({
                 "week": week,
                 "brand": brand,
+                "tier": tier,
                 "box_price": box_price,
                 "Per serving": pps,
                 "Per 100 cal": pps / (avg_kcal / 100) if avg_kcal else None,
@@ -238,9 +258,19 @@ gousto_window = gousto_all[gousto_all["week"].isin(visible_weeks)] if not gousto
 hf_window = hf_all[hf_all["week"].isin(visible_weeks)] if not hf_all.empty else hf_all
 prices_window = prices_all[prices_all["week"].isin(visible_weeks)] if not prices_all.empty else prices_all
 
-# Pre-compute both metric tables once so every tab can pull whichever it needs.
-summary_window = compute_weekly_metrics(gousto_window, hf_window, prices_window)
-summary_full = compute_weekly_metrics(gousto_all, hf_all, prices_all)
+# Pre-compute the metric tables PER TIER (Total / Core / Premium) once so
+# every tab can pull whichever combination it needs.
+TIERS = ("Total", "Core", "Premium")
+summary_window_by_tier = {
+    t: compute_weekly_metrics(gousto_window, hf_window, prices_window, tier=t)
+    for t in TIERS
+}
+summary_full_by_tier = {
+    t: compute_weekly_metrics(gousto_all, hf_all, prices_all, tier=t)
+    for t in TIERS
+}
+summary_window = summary_window_by_tier["Total"]  # back-compat alias
+summary_full = summary_full_by_tier["Total"]      # back-compat alias
 
 logo_candidates = [ASSETS_DIR / "hellofresh_logo.png",
                    ASSETS_DIR / "hellofresh_logo.svg",
@@ -299,9 +329,7 @@ with tab_pricing:
         )
         st.stop()
 
-    delta_df = compute_deltas(summary_window, METRICS)
-
-    # Shared legend + Δ% caption above the three panels
+    # Shared legend + Δ% caption — rendered once above all three tier sections
     legend_col, _, hint_col = st.columns([2, 4, 2])
     with legend_col:
         st.markdown(
@@ -318,87 +346,99 @@ with tab_pricing:
             unsafe_allow_html=True,
         )
 
-    panel_cols = st.columns(len(METRICS))
-    for col, metric_name in zip(panel_cols, METRICS):
-        df_m = summary_window.copy()
-        weeks_sorted = sorted(df_m["week"].unique())
-        max_val = float(df_m[metric_name].max())
-        y_max = max_val * 1.20 if max_val > 0 else 1.0
+    TIER_BLURB = {
+        "Total": "All recipes on the menu (Core + Premium combined).",
+        "Core": "Standard recipes — what the £67.98 / £77.98 box buys with no add-ons.",
+        "Premium": "Surcharge recipes only — premium picks that cost extra per portion.",
+    }
 
-        fig = go.Figure()
-        for brand, color in [("Gousto", GOUSTO_COLOR), ("HelloFresh", HF_COLOR)]:
-            df_b = (df_m[df_m["brand"] == brand]
-                    .set_index("week").reindex(weeks_sorted).reset_index())
-            fig.add_trace(go.Bar(
-                x=df_b["week"], y=df_b[metric_name],
-                name=brand, marker_color=color, showlegend=False,
-                hovertemplate=f"%{{x}}<br>{brand}: £%{{y:.2f}}<extra></extra>",
-            ))
+    def _color_delta(v):
+        if pd.isna(v):
+            return ""
+        return ("background-color: #FADBD8; color: #C0392B"
+                if v > 0
+                else "background-color: #D5F5E3; color: #1E8449")
 
-        # Δ% annotation above each HF bar (skip if no comparable deltas)
-        if delta_df.empty or "week" not in delta_df.columns:
-            iter_rows = iter(())
-        else:
-            iter_rows = df_m[df_m["brand"] == "HelloFresh"].iterrows()
-        for _, r in iter_rows:
-            d_row = delta_df[(delta_df["week"] == r["week"]) &
-                             (delta_df["metric"] == metric_name)]
-            if d_row.empty:
-                continue
-            d = d_row.iloc[0]["delta"]
-            fig.add_annotation(
-                x=r["week"], y=r[metric_name],
-                text=f"<b>{d:+.1%}</b>",
-                showarrow=False, yshift=14, xshift=14,
-                font=dict(color=DELTA_RED if d > 0 else DELTA_GREEN, size=12),
+    for tier in TIERS:
+        st.markdown(f"### {tier}")
+        st.caption(TIER_BLURB[tier])
+        summary_tier = summary_window_by_tier[tier]
+        if summary_tier.empty:
+            st.info(f"No {tier.lower()} recipes available in this 3-week window.")
+            continue
+
+        delta_df = compute_deltas(summary_tier, METRICS)
+        panel_cols = st.columns(len(METRICS))
+        for col, metric_name in zip(panel_cols, METRICS):
+            weeks_sorted = sorted(summary_tier["week"].unique())
+            max_val = float(summary_tier[metric_name].max())
+            y_max = max_val * 1.20 if max_val > 0 else 1.0
+
+            fig = go.Figure()
+            for brand, color in [("Gousto", GOUSTO_COLOR), ("HelloFresh", HF_COLOR)]:
+                df_b = (summary_tier[summary_tier["brand"] == brand]
+                        .set_index("week").reindex(weeks_sorted).reset_index())
+                fig.add_trace(go.Bar(
+                    x=df_b["week"], y=df_b[metric_name],
+                    name=brand, marker_color=color, showlegend=False,
+                    hovertemplate=f"%{{x}}<br>{brand} ({tier}): £%{{y:.2f}}<extra></extra>",
+                ))
+
+            for _, r in summary_tier[summary_tier["brand"] == "HelloFresh"].iterrows():
+                if delta_df.empty:
+                    continue
+                d_row = delta_df[(delta_df["week"] == r["week"]) &
+                                 (delta_df["metric"] == metric_name)]
+                if d_row.empty:
+                    continue
+                d = d_row.iloc[0]["delta"]
+                fig.add_annotation(
+                    x=r["week"], y=r[metric_name],
+                    text=f"<b>{d:+.1%}</b>",
+                    showarrow=False, yshift=14, xshift=14,
+                    font=dict(color=DELTA_RED if d > 0 else DELTA_GREEN, size=12),
+                )
+
+            fig.update_layout(
+                title=dict(text=metric_name, x=0.5, xanchor="center",
+                           font=dict(size=15, color="#333")),
+                yaxis=dict(title=METRIC_AXIS_TITLE[metric_name],
+                           range=[0, y_max], tickformat="£.2f",
+                           gridcolor="rgba(0,0,0,0.08)"),
+                xaxis=dict(title="HelloFresh week", showgrid=False),
+                barmode="group", bargap=0.30, bargroupgap=0.05,
+                height=360,
+                margin=dict(l=70, r=20, t=50, b=40),
+                plot_bgcolor="white",
             )
+            with col:
+                st.plotly_chart(fig, use_container_width=True, key=f"{tier}_{metric_name}")
 
-        fig.update_layout(
-            title=dict(text=metric_name, x=0.5, xanchor="center",
-                       font=dict(size=16, color="#333")),
-            yaxis=dict(title=METRIC_AXIS_TITLE[metric_name],
-                       range=[0, y_max], tickformat="£.2f",
-                       gridcolor="rgba(0,0,0,0.08)"),
-            xaxis=dict(title="HelloFresh week", showgrid=False),
-            barmode="group", bargap=0.30, bargroupgap=0.05,
-            height=400,
-            margin=dict(l=70, r=20, t=50, b=40),
-            plot_bgcolor="white",
+        if not delta_df.empty:
+            delta_table = (delta_df.pivot(index="metric", columns="week", values="delta")
+                           .reindex(METRICS))
+            st.markdown(f"**Δ% summary — {tier}**")
+            st.dataframe(
+                delta_table.style.format("{:+.1%}").map(_color_delta),
+                use_container_width=True,
+            )
+        st.divider()
+
+    with st.expander("Underlying numbers (full history, all tiers)"):
+        full_with_tier = pd.concat(
+            [summary_full_by_tier[t] for t in TIERS], ignore_index=True
         )
-        with col:
-            st.plotly_chart(fig, use_container_width=True)
-
-    # Δ% summary table
-    if not delta_df.empty:
-        delta_table = (delta_df.pivot(index="metric", columns="week", values="delta")
-                       .reindex(METRICS))
-
-        def color_delta(v):
-            if pd.isna(v):
-                return ""
-            return ("background-color: #FADBD8; color: #C0392B"
-                    if v > 0
-                    else "background-color: #D5F5E3; color: #1E8449")
-
-        st.subheader("Δ% summary")
-        st.dataframe(
-            delta_table.style.format("{:+.1%}").map(color_delta),
-            use_container_width=True,
-        )
-
-    with st.expander("Underlying numbers (full history — appends every week)"):
-        disp = summary_full.copy()
         for c in ("box_price", "Per serving", "Per 100 cal", "Per 100g"):
-            if c in disp.columns:
-                disp[c] = disp[c].apply(
+            if c in full_with_tier.columns:
+                full_with_tier[c] = full_with_tier[c].apply(
                     lambda x: f"£{x:.2f}" if pd.notna(x) else ""
                 )
         for c in ("avg_kcal_per_serving", "avg_grams_per_serving"):
-            if c in disp.columns:
-                disp[c] = disp[c].round(1)
+            if c in full_with_tier.columns:
+                full_with_tier[c] = full_with_tier[c].round(1)
         st.dataframe(
-            disp.sort_values(["week", "brand"])
-                .rename(columns={"week": "hellofresh_week"}),
+            full_with_tier.sort_values(["week", "tier", "brand"])
+                          .rename(columns={"week": "hellofresh_week"}),
             use_container_width=True, hide_index=True,
         )
 
@@ -407,18 +447,22 @@ with tab_pricing:
 with tab_trends:
     st.header("Historic price trends")
 
-    full_summary = summary_full
-    if full_summary.empty:
+    if summary_full.empty:
         st.info(
             "Not enough data yet. Need at least one week with all three sources "
             "(Gousto + HelloFresh + price)."
         )
     else:
-        n_weeks = full_summary["week"].nunique()
+        n_weeks = summary_full["week"].nunique()
         st.caption(
             f"Tracking **{n_weeks} week(s)** of data. Each Tuesday/Wednesday "
-            f"update extends these charts by one week."
+            f"update extends these charts by one week. Click legend entries to "
+            f"hide / show series."
         )
+
+        # 6 lines per chart: 2 brands × 3 tiers. Distinguish by colour (brand)
+        # + dash style (tier). Click any legend item to toggle.
+        TIER_DASH = {"Total": "solid", "Core": "dash", "Premium": "dot"}
 
         for metric_name, axis_title in (
             ("Per 100 cal", "Price per 100 kcal (£)"),
@@ -426,22 +470,30 @@ with tab_trends:
         ):
             fig = go.Figure()
             for brand, color in [("Gousto", GOUSTO_COLOR), ("HelloFresh", HF_COLOR)]:
-                df_b = (full_summary[full_summary["brand"] == brand]
-                        .sort_values("week"))
-                fig.add_trace(go.Scatter(
-                    x=df_b["week"], y=df_b[metric_name],
-                    name=brand, mode="lines+markers",
-                    line=dict(color=color, width=3),
-                    marker=dict(size=10, line=dict(color="white", width=1.5)),
-                    hovertemplate=f"%{{x}}<br>{brand}: £%{{y:.2f}}<extra></extra>",
-                ))
+                for tier in TIERS:
+                    src = summary_full_by_tier[tier]
+                    df_b = (src[src["brand"] == brand]
+                            .sort_values("week"))
+                    if df_b.empty:
+                        continue
+                    fig.add_trace(go.Scatter(
+                        x=df_b["week"], y=df_b[metric_name],
+                        name=f"{brand} — {tier}",
+                        mode="lines+markers",
+                        line=dict(color=color, width=2.5 if tier == "Total" else 2,
+                                  dash=TIER_DASH[tier]),
+                        marker=dict(size=8 if tier == "Total" else 6,
+                                    line=dict(color="white", width=1)),
+                        legendgroup=brand,
+                        hovertemplate=f"%{{x}}<br>{brand} ({tier}): £%{{y:.2f}}<extra></extra>",
+                    ))
             fig.update_layout(
                 title=dict(text=axis_title, x=0.5, xanchor="center",
                            font=dict(size=16, color="#333")),
                 xaxis=dict(title="HelloFresh week", showgrid=False),
                 yaxis=dict(title=axis_title, tickformat="£.2f",
                            gridcolor="rgba(0,0,0,0.08)"),
-                height=380,
+                height=400,
                 margin=dict(l=70, r=30, t=60, b=50),
                 plot_bgcolor="white",
                 legend=dict(orientation="h", x=0, y=1.10,
@@ -449,10 +501,12 @@ with tab_trends:
                             bgcolor="rgba(0,0,0,0)"),
                 hovermode="x unified",
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, key=f"trends_{metric_name}")
 
-        with st.expander("Underlying numbers (full history)"):
-            disp = full_summary.copy()
+        with st.expander("Underlying numbers (full history, all tiers)"):
+            disp = pd.concat(
+                [summary_full_by_tier[t] for t in TIERS], ignore_index=True
+            )
             for c in ("box_price", "Per serving", "Per 100 cal", "Per 100g"):
                 if c in disp.columns:
                     disp[c] = disp[c].apply(
@@ -462,7 +516,7 @@ with tab_trends:
                 if c in disp.columns:
                     disp[c] = disp[c].round(1)
             st.dataframe(
-                disp.sort_values(["week", "brand"])
+                disp.sort_values(["week", "tier", "brand"])
                     .rename(columns={"week": "hellofresh_week"}),
                 use_container_width=True, hide_index=True,
             )
@@ -474,13 +528,25 @@ with tab_hf:
         st.info("No HelloFresh data yet. Drop CSVs into `data/hellofresh/`.")
     else:
         weeks = sorted(hf_all["week"].unique(), reverse=True)
-        sel = st.multiselect("HelloFresh week(s)", weeks, default=weeks, key="hf_weeks")
-        f = hf_all[hf_all["week"].isin(sel)]
+        col_wk, col_tier = st.columns([3, 1])
+        with col_wk:
+            sel = st.multiselect("HelloFresh week(s)", weeks, default=weeks, key="hf_weeks")
+        available_tiers = sorted(hf_all["tier"].dropna().unique().tolist())
+        with col_tier:
+            tier_sel = st.multiselect(
+                "Tier", available_tiers, default=available_tiers, key="hf_tier",
+                help="Premium = slots 72-80 (surcharge recipes). "
+                     "Core = slots 1-71 — what the £77.98 box buys.",
+            )
+        f = hf_all[hf_all["week"].isin(sel) & hf_all["tier"].isin(tier_sel)]
+        n_core = (f["tier"] == "Core").sum()
+        n_prem = (f["tier"] == "Premium").sum()
         st.caption(
             f"{len(f):,} recipe-rows across {f['week'].nunique()} HelloFresh week(s) · "
-            f"{f['recipe_title'].nunique():,} unique recipes"
+            f"{f['recipe_title'].nunique():,} unique recipes · "
+            f"**{n_core:,} Core**, **{n_prem:,} Premium**"
         )
-        show = f[["week", "slot_number", "recipe_title",
+        show = f[["week", "slot_number", "tier", "recipe_title",
                   "kcal_per_serving", "kj_per_serving", "grams_per_serving"]].copy()
         show["kcal_per_serving"] = show["kcal_per_serving"].round(0)
         show["kj_per_serving"] = show["kj_per_serving"].round(0)
