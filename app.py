@@ -166,28 +166,31 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total"):
     if prices_df.empty:
         return pd.DataFrame(rows)
 
-    def _filter_tier(m_df):
-        """Return (filtered_df, methodology_label). When tier=='Core' we INCLUDE
-        rows whose tier is 'Unknown' (data scraped before surcharge tracking)
-        so old weeks still appear in trend charts; the label flags which way
-        the avg was computed for that row."""
-        if tier == "Total" or "tier" not in m_df.columns:
-            return m_df, "All recipes"
-        if tier == "Core":
-            sub = m_df[m_df["tier"].isin(["Core", "Unknown"])]
-            n_core = (sub["tier"] == "Core").sum()
-            n_unknown = (sub["tier"] == "Unknown").sum()
-            if n_core == 0 and n_unknown > 0:
-                label = "All recipes (estimated — premium tracking added W22)"
-            elif n_unknown > 0:
-                label = "Mixed (partial tier data)"
-            else:
-                label = "Core only"
-            return sub, label
-        sub = m_df[m_df["tier"] == tier]
-        return sub, f"{tier} only"
+    def _gousto_has_tier(week):
+        """True if Gousto's scrape for this week carries Core/Premium info."""
+        if gousto_df.empty or "tier" not in gousto_df.columns:
+            return False
+        g_wk = gousto_df[gousto_df["week"] == week]
+        if g_wk.empty:
+            return False
+        return g_wk["tier"].isin(["Core", "Premium"]).any()
 
     for week in sorted(prices_df["week"].unique()):
+        # Per-week methodology, driven by Gousto data availability. If Gousto's
+        # scrape for this week has surcharge tracking, BOTH brands filter to
+        # the requested tier (apples-to-apples). If it doesn't, BOTH brands
+        # average across all recipes — HF must drop its tier filter so it
+        # isn't unfairly compared against an all-recipes Gousto average.
+        if tier == "Total":
+            apply_tier = False
+            methodology = "All recipes"
+        elif _gousto_has_tier(week):
+            apply_tier = True
+            methodology = f"{tier} only"
+        else:
+            apply_tier = False
+            methodology = "All recipes (estimated — premium tracking added W22)"
+
         for brand in ("Gousto", "HelloFresh"):
             pr = prices_df[(prices_df["week"] == week) & (prices_df["brand"] == brand)]
             if pr.empty:
@@ -195,14 +198,16 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total"):
             box_price = pr["box_price"].iloc[0]
             if brand == "Gousto":
                 m = gousto_df[gousto_df["week"] == week] if not gousto_df.empty else gousto_df
-                m, methodology = _filter_tier(m)
+                if apply_tier and "tier" in m.columns:
+                    m = m[m["tier"] == tier]
                 if m.empty:
                     continue
                 avg_kcal = m["kcal_per_portion"].mean()
                 avg_grams = m["portion_weight_g"].mean()
             else:
                 m = hf_df[hf_df["week"] == week] if not hf_df.empty else hf_df
-                m, methodology = _filter_tier(m)
+                if apply_tier and "tier" in m.columns:
+                    m = m[m["tier"] == tier]
                 if m.empty:
                     continue
                 avg_kcal = m["kcal_per_serving"].mean()
@@ -356,7 +361,8 @@ with tab_pricing:
         est_weeks_here = sorted(summary_window.loc[window_est, "week"].unique())
         st.warning(
             f"⚠ Mixed methodology in this 3-week window. {', '.join(est_weeks_here)} "
-            f"averaged Gousto across all recipes (premium tracking added W22).",
+            f"averaged BOTH brands across all menu recipes (premium tracking "
+            f"added W22); other weeks use Core only.",
             icon="⚠",
         )
 
@@ -498,12 +504,12 @@ with tab_trends:
             st.warning(
                 f"⚠ **Methodology shift at W22**. Surcharge tracking for Gousto "
                 f"recipes was added on **2026-05-31** (W22). For weeks **before "
-                f"W22** ({', '.join(estimated_weeks)}), Gousto averages include "
-                f"all menu recipes (~189) because we couldn't distinguish Core "
-                f"from Premium at scrape time. From **W22 onwards**, Gousto "
-                f"averages cover Core recipes only (~150). HelloFresh data is "
-                f"Core-only for every week. **Hollow markers** in the charts "
-                f"below mark the estimated weeks; **filled markers** are exact.",
+                f"W22** ({', '.join(estimated_weeks)}), **both brands** average "
+                f"across all menu recipes (Gousto ~189, HelloFresh 80) so the "
+                f"comparison stays apples-to-apples. From **W22 onwards**, "
+                f"both brands average Core recipes only (Gousto ~150, "
+                f"HelloFresh 71). **Hollow markers** in the charts below mark "
+                f"the all-recipes weeks; **filled markers** are Core-only.",
                 icon="⚠",
             )
 
@@ -719,13 +725,12 @@ with st.sidebar:
     )
     st.info(
         "⚠ **Methodology note**: Gousto surcharge tracking was added on "
-        "**2026-05-31** (W22). Data **before W22** averages all Gousto "
-        "recipes (Core + Premium combined, ~189) because Core/Premium "
-        "wasn't distinguishable at scrape time. **From W22 onwards**, "
-        "Gousto averages cover Core recipes only (~150). HelloFresh data "
-        "is Core-only for every week. Charts mark estimated weeks with "
-        "**hollow markers**; tables flag them in the `core_methodology` "
-        "column.",
+        "**2026-05-31** (W22). For weeks **before W22**, **both brands** "
+        "average across all menu recipes (Gousto ~189, HelloFresh 80) so "
+        "the comparison stays apples-to-apples. **From W22 onwards**, both "
+        "brands average Core recipes only (Gousto ~150, HelloFresh 71). "
+        "Charts mark all-recipes weeks with **hollow markers**; tables "
+        "flag them in the `core_methodology` column.",
         icon="⚠",
     )
     st.markdown(
