@@ -167,9 +167,25 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total"):
         return pd.DataFrame(rows)
 
     def _filter_tier(m_df):
+        """Return (filtered_df, methodology_label). When tier=='Core' we INCLUDE
+        rows whose tier is 'Unknown' (data scraped before surcharge tracking)
+        so old weeks still appear in trend charts; the label flags which way
+        the avg was computed for that row."""
         if tier == "Total" or "tier" not in m_df.columns:
-            return m_df
-        return m_df[m_df["tier"] == tier]
+            return m_df, "All recipes"
+        if tier == "Core":
+            sub = m_df[m_df["tier"].isin(["Core", "Unknown"])]
+            n_core = (sub["tier"] == "Core").sum()
+            n_unknown = (sub["tier"] == "Unknown").sum()
+            if n_core == 0 and n_unknown > 0:
+                label = "All recipes (estimated — premium tracking added W22)"
+            elif n_unknown > 0:
+                label = "Mixed (partial tier data)"
+            else:
+                label = "Core only"
+            return sub, label
+        sub = m_df[m_df["tier"] == tier]
+        return sub, f"{tier} only"
 
     for week in sorted(prices_df["week"].unique()):
         for brand in ("Gousto", "HelloFresh"):
@@ -179,14 +195,14 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total"):
             box_price = pr["box_price"].iloc[0]
             if brand == "Gousto":
                 m = gousto_df[gousto_df["week"] == week] if not gousto_df.empty else gousto_df
-                m = _filter_tier(m)
+                m, methodology = _filter_tier(m)
                 if m.empty:
                     continue
                 avg_kcal = m["kcal_per_portion"].mean()
                 avg_grams = m["portion_weight_g"].mean()
             else:
                 m = hf_df[hf_df["week"] == week] if not hf_df.empty else hf_df
-                m = _filter_tier(m)
+                m, methodology = _filter_tier(m)
                 if m.empty:
                     continue
                 avg_kcal = m["kcal_per_serving"].mean()
@@ -196,6 +212,7 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total"):
                 "week": week,
                 "brand": brand,
                 "tier": tier,
+                "core_methodology": methodology,
                 "box_price": box_price,
                 "Per serving": pps,
                 "Per 100 cal": pps / (avg_kcal / 100) if avg_kcal else None,
@@ -330,6 +347,19 @@ with tab_pricing:
         )
         st.stop()
 
+    # If any week in the rolling 3-week window was averaged off Unknown rows,
+    # flag it (only happens if the rolling window dips back into pre-W22 data).
+    window_est = summary_window["core_methodology"].str.startswith(
+        "All recipes", na=False
+    )
+    if window_est.any():
+        est_weeks_here = sorted(summary_window.loc[window_est, "week"].unique())
+        st.warning(
+            f"⚠ Mixed methodology in this 3-week window. {', '.join(est_weeks_here)} "
+            f"averaged Gousto across all recipes (premium tracking added W22).",
+            icon="⚠",
+        )
+
     st.caption(
         "Averaged across **Core recipes only** — the standard menu items the "
         "subscription box price buys, with no surcharge upgrades."
@@ -418,6 +448,12 @@ with tab_pricing:
         )
 
     with st.expander("Underlying numbers (full history — Core recipes only)"):
+        st.caption(
+            "The `core_methodology` column flags how each row's averages were "
+            "computed. **Core only** = exact (surcharge tracking enabled). "
+            "**All recipes (estimated…)** = pre-W22 data, averaged across all "
+            "menu recipes because Core/Premium wasn't yet distinguishable."
+        )
         disp = summary_full_by_tier["Core"].copy()
         for c in ("box_price", "Per serving", "Per 100 cal", "Per 100g"):
             if c in disp.columns:
@@ -446,11 +482,30 @@ with tab_trends:
         )
     else:
         n_weeks = full_summary["week"].nunique()
-        st.caption(
-            f"Tracking **{n_weeks} week(s)** of data — averaged across **Core "
-            f"recipes only**. Each Tuesday/Wednesday update extends these "
-            f"charts by one week."
+        # Detect any week whose Gousto average was computed off Unknown rows
+        # (i.e. CSVs scraped before surcharge tracking added on 2026-W22).
+        est_mask = full_summary["core_methodology"].str.startswith(
+            "All recipes", na=False
         )
+        estimated_weeks = sorted(full_summary.loc[est_mask, "week"].unique())
+
+        st.caption(
+            f"Tracking **{n_weeks} week(s)** — averaged across **Core recipes "
+            f"only**. Each Tuesday/Wednesday update extends these charts by "
+            f"one week."
+        )
+        if estimated_weeks:
+            st.warning(
+                f"⚠ **Methodology shift at W22**. Surcharge tracking for Gousto "
+                f"recipes was added on **2026-05-31** (W22). For weeks **before "
+                f"W22** ({', '.join(estimated_weeks)}), Gousto averages include "
+                f"all menu recipes (~189) because we couldn't distinguish Core "
+                f"from Premium at scrape time. From **W22 onwards**, Gousto "
+                f"averages cover Core recipes only (~150). HelloFresh data is "
+                f"Core-only for every week. **Hollow markers** in the charts "
+                f"below mark the estimated weeks; **filled markers** are exact.",
+                icon="⚠",
+            )
 
         for metric_name, axis_title in (
             ("Per 100 cal", "Price per 100 kcal (£)"),
@@ -459,22 +514,52 @@ with tab_trends:
             fig = go.Figure()
             for brand, color in [("Gousto", GOUSTO_COLOR), ("HelloFresh", HF_COLOR)]:
                 df_b = (full_summary[full_summary["brand"] == brand]
-                        .sort_values("week"))
+                        .sort_values("week")
+                        .reset_index(drop=True))
+                # Per-point styling: hollow circle if this row's average was
+                # taken off Unknown rows (estimated); filled circle if exact.
+                is_estimated = df_b["core_methodology"].str.startswith(
+                    "All recipes", na=False
+                )
+                symbols = ["circle-open" if e else "circle" for e in is_estimated]
+                sizes = [11 if e else 10 for e in is_estimated]
+                line_widths = [2.5 if e else 1.5 for e in is_estimated]
+                hover = [
+                    f"{brand}: £{y:.2f}<br>"
+                    + ("<i>estimated — pre-W22 all-recipe avg</i>"
+                       if e else "exact — Core only")
+                    for y, e in zip(df_b[metric_name], is_estimated)
+                ]
                 fig.add_trace(go.Scatter(
                     x=df_b["week"], y=df_b[metric_name],
                     name=brand, mode="lines+markers",
                     line=dict(color=color, width=3),
-                    marker=dict(size=10, line=dict(color="white", width=1.5)),
-                    hovertemplate=f"%{{x}}<br>{brand}: £%{{y:.2f}}<extra></extra>",
+                    marker=dict(size=sizes, symbol=symbols,
+                                color=color,
+                                line=dict(color=color, width=line_widths)),
+                    text=hover, hovertemplate="%{x}<br>%{text}<extra></extra>",
                 ))
+
+            # Vertical "tracking begins" annotation if there's a transition
+            if estimated_weeks and "2026-W22" in full_summary["week"].values:
+                fig.add_vline(
+                    x="2026-W22", line=dict(color="#888", dash="dash", width=1),
+                )
+                fig.add_annotation(
+                    x="2026-W22", y=1.02, xref="x", yref="paper",
+                    text="Tier tracking begins →",
+                    showarrow=False, xanchor="left",
+                    font=dict(size=11, color="#666"),
+                )
+
             fig.update_layout(
                 title=dict(text=axis_title, x=0.5, xanchor="center",
                            font=dict(size=16, color="#333")),
                 xaxis=dict(title="HelloFresh week", showgrid=False),
                 yaxis=dict(title=axis_title, tickformat="£.2f",
                            gridcolor="rgba(0,0,0,0.08)"),
-                height=380,
-                margin=dict(l=70, r=30, t=60, b=50),
+                height=400,
+                margin=dict(l=70, r=30, t=70, b=50),
                 plot_bgcolor="white",
                 legend=dict(orientation="h", x=0, y=1.10,
                             yanchor="bottom", xanchor="left",
@@ -484,6 +569,13 @@ with tab_trends:
             st.plotly_chart(fig, use_container_width=True)
 
         with st.expander("Underlying numbers (full history — Core recipes only)"):
+            st.caption(
+                "The `core_methodology` column flags how each row's averages "
+                "were computed. **Core only** = exact (surcharge tracking "
+                "enabled). **All recipes (estimated…)** = pre-W22 data, "
+                "averaged across all menu recipes because Core/Premium "
+                "wasn't yet distinguishable."
+            )
             disp = full_summary.copy()
             for c in ("box_price", "Per serving", "Per 100 cal", "Per 100g"):
                 if c in disp.columns:
@@ -624,6 +716,17 @@ with st.sidebar:
         "**Price per 100g** \n"
         "`= Price per serving ÷ (avg grams per serving ÷ 100)`  \n"
         "*Avg grams per serving* is calculated the same way (Core only)."
+    )
+    st.info(
+        "⚠ **Methodology note**: Gousto surcharge tracking was added on "
+        "**2026-05-31** (W22). Data **before W22** averages all Gousto "
+        "recipes (Core + Premium combined, ~189) because Core/Premium "
+        "wasn't distinguishable at scrape time. **From W22 onwards**, "
+        "Gousto averages cover Core recipes only (~150). HelloFresh data "
+        "is Core-only for every week. Charts mark estimated weeks with "
+        "**hollow markers**; tables flag them in the `core_methodology` "
+        "column.",
+        icon="⚠",
     )
     st.markdown(
         "**Δ% (delta)** \n"
