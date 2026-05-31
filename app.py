@@ -184,12 +184,15 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total"):
         if tier == "Total":
             apply_tier = False
             methodology = "All recipes"
+            applied_tier_label = "All recipes"
         elif _gousto_has_tier(week):
             apply_tier = True
             methodology = f"{tier} only"
+            applied_tier_label = tier
         else:
             apply_tier = False
             methodology = "All recipes (estimated — premium tracking added W22)"
+            applied_tier_label = "All recipes"
 
         for brand in ("Gousto", "HelloFresh"):
             pr = prices_df[(prices_df["week"] == week) & (prices_df["brand"] == brand)]
@@ -216,7 +219,7 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total"):
             rows.append({
                 "week": week,
                 "brand": brand,
-                "tier": tier,
+                "tier": applied_tier_label,
                 "core_methodology": methodology,
                 "box_price": box_price,
                 "Per serving": pps,
