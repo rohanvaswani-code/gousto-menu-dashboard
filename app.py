@@ -1,6 +1,7 @@
 """Gousto vs HelloFresh menu + pricing dashboard."""
 
 import base64
+import json
 import re
 from datetime import date, timedelta
 from pathlib import Path
@@ -331,8 +332,9 @@ METRIC_AXIS_TITLE = {
     "Per 100g": "Price per 100g (£)",
 }
 
-tab_pricing, tab_trends, tab_hf, tab_gousto = st.tabs([
-    "Pricing comparison", "Historic trends", "HelloFresh recipes", "Gousto recipes",
+tab_pricing, tab_trends, tab_hf, tab_gousto, tab_ingredients = st.tabs([
+    "Pricing comparison", "Historic trends", "HelloFresh recipes",
+    "Gousto recipes", "Gousto ingredients",
 ])
 
 # -------------------- TAB: PRICING (3-week window) --------------------
@@ -694,6 +696,115 @@ with tab_gousto:
             out.to_csv(index=False).encode("utf-8"),
             "gousto_filtered.csv", "text/csv",
         )
+
+# -------------------- TAB: GOUSTO INGREDIENTS --------------------
+with tab_ingredients:
+    st.header("Gousto recipes — ingredient breakdown")
+    if gousto_all.empty or "ingredients_json" not in gousto_all.columns:
+        st.info(
+            "No ingredient data yet. The scraper started capturing ingredient "
+            "lists on 2026-05-31; data will appear here from the next scrape "
+            "onwards."
+        )
+    else:
+        # Restrict to rows with ingredients (old scrapes pre-dating ingredient
+        # capture have an empty / missing ingredients_json)
+        has_ings = gousto_all["ingredients_json"].fillna("").astype(str).str.len() > 2
+        gi = gousto_all[has_ings].copy()
+        if gi.empty:
+            st.info(
+                "No ingredient data in any of the loaded CSVs yet. Run the "
+                "scraper once after 2026-05-31 to populate this tab."
+            )
+        else:
+            weeks = sorted(gi["week"].unique(), reverse=True)
+            col_wk, col_ing = st.columns([2, 2])
+            with col_wk:
+                sel_weeks = st.multiselect(
+                    "HelloFresh week(s)", weeks, default=weeks,
+                    key="ing_weeks",
+                )
+            with col_ing:
+                ingredient_filter = st.text_input(
+                    "Filter by ingredient (e.g. chicken, paprika)",
+                    key="ing_filter",
+                    help="Case-insensitive substring match against any "
+                         "ingredient name on the recipe.",
+                ).strip().lower()
+
+            f = gi[gi["week"].isin(sel_weeks)].copy()
+
+            # Parse the JSON into a list of label strings per recipe
+            def _parse(js):
+                try:
+                    arr = json.loads(js) if js else []
+                    return [i.get("label") or i.get("name") or "" for i in arr]
+                except (json.JSONDecodeError, TypeError):
+                    return []
+            f["_ing_labels"] = f["ingredients_json"].apply(_parse)
+            f["ingredient_count"] = f["_ing_labels"].apply(len)
+            f["ingredients"] = f["_ing_labels"].apply(lambda lst: ", ".join(lst))
+
+            if ingredient_filter:
+                f = f[f["_ing_labels"].apply(
+                    lambda lst: any(ingredient_filter in s.lower() for s in lst)
+                )]
+
+            f["menu_date"] = pd.to_datetime(
+                f["menu_week_start"], errors="coerce"
+            ).dt.strftime("%d/%m/%Y")
+
+            st.caption(
+                f"{len(f):,} recipe(s) shown across "
+                f"{f['week'].nunique()} HelloFresh week(s). Average "
+                f"{f['ingredient_count'].mean():.0f} ingredients per recipe."
+            )
+
+            cols = ["week", "menu_date", "name", "tier",
+                    "ingredient_count", "ingredients"]
+            cols = [c for c in cols if c in f.columns]
+            out = (f[cols]
+                   .sort_values(["week", "name"], ascending=[False, True])
+                   .rename(columns={"week": "hellofresh_week"}))
+
+            st.dataframe(
+                out,
+                use_container_width=True,
+                hide_index=True,
+                column_config={
+                    "ingredients": st.column_config.TextColumn(
+                        "ingredients", width="large",
+                        help="Comma-separated list of every ingredient with "
+                             "its quantity, as published by Gousto.",
+                    ),
+                },
+            )
+            st.download_button(
+                "Download filtered CSV",
+                out.to_csv(index=False).encode("utf-8"),
+                "gousto_ingredients.csv", "text/csv",
+            )
+
+            # Optional long-format view (one row per recipe × ingredient)
+            with st.expander("Long-format view (one row per recipe × ingredient)"):
+                rows = []
+                for _, r in f.iterrows():
+                    for label in r["_ing_labels"]:
+                        rows.append({
+                            "hellofresh_week": r["week"],
+                            "menu_date": r["menu_date"],
+                            "recipe_name": r["name"],
+                            "tier": r.get("tier", ""),
+                            "ingredient": label,
+                        })
+                long_df = pd.DataFrame(rows)
+                st.dataframe(long_df, use_container_width=True, hide_index=True)
+                if not long_df.empty:
+                    st.download_button(
+                        "Download long-format CSV",
+                        long_df.to_csv(index=False).encode("utf-8"),
+                        "gousto_ingredients_long.csv", "text/csv",
+                    )
 
 # -------------------- SIDEBAR --------------------
 with st.sidebar:

@@ -241,6 +241,17 @@ def make_row(rid, menu_recipe, detail, week_start, scraped_at):
     surcharge_per_portion_gbp = round((surcharge_pence or 0) / 100, 2)
     is_surcharge = surcharge_per_portion_gbp > 0
 
+    # Ingredient list — only available from the recipe detail endpoint. Each
+    # item is {label, name, gousto_uuid, ...}; we keep a slim version (name +
+    # label) as a JSON string so the CSV stays a single column per recipe.
+    ingredients_json = ""
+    if detail:
+        ings_raw = (detail.get("data") or {}).get("entry", {}).get("ingredients") or []
+        slim = [{"name": i.get("name", ""), "label": i.get("label", "")}
+                for i in ings_raw if isinstance(i, dict)]
+        if slim:
+            ingredients_json = json.dumps(slim, ensure_ascii=False)
+
     return {
         "menu_week_start": week_start,
         "scraped_at": scraped_at,
@@ -275,6 +286,7 @@ def make_row(rid, menu_recipe, detail, week_start, scraped_at):
         "rating_avg": (menu_recipe.get("rating") or {}).get("average", ""),
         "rating_count": (menu_recipe.get("rating") or {}).get("count", ""),
         "is_available": menu_recipe.get("is_available", ""),
+        "ingredients_json": ingredients_json,
     }
 
 
