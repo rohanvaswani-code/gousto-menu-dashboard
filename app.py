@@ -728,11 +728,27 @@ with tab_ingredients:
 
             f = gi[gi["week"].isin(sel_weeks)].copy()
 
-            # Parse the JSON into a list of label strings per recipe
+            # Parse the JSON into a list of label strings per recipe. Gousto's
+            # label format is "<name> (<qty><unit>) x<packs>" where 'packs' is
+            # the count of standard packs at the requested portion size. x0
+            # and x1 are noise (qty is already in parentheses, or it's just
+            # one pack) — strip those so only meaningful multi-pack counts
+            # like 'x2' survive.
+            _trailing_pack = re.compile(r"\s*x\s*(\d+)\s*$")
+
+            def _clean(label):
+                m = _trailing_pack.search(label)
+                if not m:
+                    return label.strip()
+                if int(m.group(1)) <= 1:
+                    return _trailing_pack.sub("", label).strip()
+                return label.strip()
+
             def _parse(js):
                 try:
                     arr = json.loads(js) if js else []
-                    return [i.get("label") or i.get("name") or "" for i in arr]
+                    return [_clean(i.get("label") or i.get("name") or "")
+                            for i in arr]
                 except (json.JSONDecodeError, TypeError):
                     return []
             f["_ing_labels"] = f["ingredients_json"].apply(_parse)
