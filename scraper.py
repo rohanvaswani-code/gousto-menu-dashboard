@@ -241,13 +241,14 @@ def make_row(rid, menu_recipe, detail, week_start, scraped_at):
     surcharge_per_portion_gbp = round((surcharge_pence or 0) / 100, 2)
     is_surcharge = surcharge_per_portion_gbp > 0
 
-    # Ingredient list — pulled from the recipe detail endpoint. The endpoint
-    # returns a UNION of SKU variants across all portion sizes, and the x{N}
-    # suffix on each label reflects Gousto's 2-portion default (not what a
-    # 4-person box actually receives). To get the true 4-portion view, look
-    # up portion_sizes[portions=NUM_PORTIONS].ingredients_skus and use the
-    # in_box count as the multiplier — that's the authoritative per-portion
-    # delivery list.
+    # Ingredient list — pulled from the recipe detail endpoint, scoped to
+    # the 2-PORTION view (Gousto's canonical per-recipe quantities; matches
+    # what you'd see if browsing the recipe page directly on gousto.co.uk).
+    # The endpoint returns a UNION of SKU variants across all portion sizes;
+    # we look up portion_sizes[portions=2].ingredients_skus and rebuild
+    # labels with the in_box multiplier from that entry. SKUs not delivered
+    # at the 2-portion size are filtered out at scrape time.
+    INGREDIENT_PORTION_SIZE = 2
     ingredients_json = ""
     if detail:
         entry = (detail.get("data") or {}).get("entry") or {}
@@ -255,11 +256,10 @@ def make_row(rid, menu_recipe, detail, week_start, scraped_at):
         portion_sizes = entry.get("portion_sizes") or []
         target = next(
             (p for p in portion_sizes
-             if p.get("portions") == NUM_PORTIONS and p.get("is_offered")),
+             if p.get("portions") == INGREDIENT_PORTION_SIZE and p.get("is_offered")),
             None,
         )
         if target:
-            # SKU uuid -> in_box count for the requested portion size
             sku_count = {}
             for s in target.get("ingredients_skus") or []:
                 uid = s.get("id")
@@ -274,7 +274,7 @@ def make_row(rid, menu_recipe, detail, week_start, scraped_at):
                 uid = ing.get("gousto_uuid")
                 cnt = sku_count.get(uid, 0)
                 if cnt < 1:
-                    continue  # SKU not delivered at this portion size
+                    continue
                 base = _trailing.sub("", ing.get("label", "")).strip()
                 label = base if cnt == 1 else f"{base} x{cnt}"
                 slim.append({"name": ing.get("name", ""),

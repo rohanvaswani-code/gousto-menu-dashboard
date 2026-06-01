@@ -700,6 +700,14 @@ with tab_gousto:
 # -------------------- TAB: GOUSTO INGREDIENTS --------------------
 with tab_ingredients:
     st.header("Gousto recipes — ingredient breakdown")
+    st.info(
+        "📦 Quantities shown are for the **2-portion box** "
+        "(Gousto's canonical per-recipe view — matches what's listed on "
+        "each recipe page on gousto.co.uk). For a 4-person box, expect "
+        "roughly double these quantities; the precise pack counts vary by "
+        "recipe.",
+        icon="ℹ️",
+    )
     if gousto_all.empty:
         st.info("No Gousto data yet.")
     else:
