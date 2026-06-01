@@ -241,16 +241,46 @@ def make_row(rid, menu_recipe, detail, week_start, scraped_at):
     surcharge_per_portion_gbp = round((surcharge_pence or 0) / 100, 2)
     is_surcharge = surcharge_per_portion_gbp > 0
 
-    # Ingredient list — only available from the recipe detail endpoint. Each
-    # item is {label, name, gousto_uuid, ...}; we keep a slim version (name +
-    # label) as a JSON string so the CSV stays a single column per recipe.
+    # Ingredient list — pulled from the recipe detail endpoint. The endpoint
+    # returns a UNION of SKU variants across all portion sizes, and the x{N}
+    # suffix on each label reflects Gousto's 2-portion default (not what a
+    # 4-person box actually receives). To get the true 4-portion view, look
+    # up portion_sizes[portions=NUM_PORTIONS].ingredients_skus and use the
+    # in_box count as the multiplier — that's the authoritative per-portion
+    # delivery list.
     ingredients_json = ""
     if detail:
-        ings_raw = (detail.get("data") or {}).get("entry", {}).get("ingredients") or []
-        slim = [{"name": i.get("name", ""), "label": i.get("label", "")}
-                for i in ings_raw if isinstance(i, dict)]
-        if slim:
-            ingredients_json = json.dumps(slim, ensure_ascii=False)
+        entry = (detail.get("data") or {}).get("entry") or {}
+        all_ings = entry.get("ingredients") or []
+        portion_sizes = entry.get("portion_sizes") or []
+        target = next(
+            (p for p in portion_sizes
+             if p.get("portions") == NUM_PORTIONS and p.get("is_offered")),
+            None,
+        )
+        if target:
+            # SKU uuid -> in_box count for the requested portion size
+            sku_count = {}
+            for s in target.get("ingredients_skus") or []:
+                uid = s.get("id")
+                if uid:
+                    sku_count[uid] = (s.get("quantities") or {}).get("in_box", 0) or 0
+
+            _trailing = re.compile(r"\s*x\s*\d+\s*$")
+            slim = []
+            for ing in all_ings:
+                if not isinstance(ing, dict):
+                    continue
+                uid = ing.get("gousto_uuid")
+                cnt = sku_count.get(uid, 0)
+                if cnt < 1:
+                    continue  # SKU not delivered at this portion size
+                base = _trailing.sub("", ing.get("label", "")).strip()
+                label = base if cnt == 1 else f"{base} x{cnt}"
+                slim.append({"name": ing.get("name", ""),
+                             "label": label, "in_box": cnt})
+            if slim:
+                ingredients_json = json.dumps(slim, ensure_ascii=False)
 
     return {
         "menu_week_start": week_start,
