@@ -700,23 +700,17 @@ with tab_gousto:
 # -------------------- TAB: GOUSTO INGREDIENTS --------------------
 with tab_ingredients:
     st.header("Gousto recipes — ingredient breakdown")
-    if gousto_all.empty or "ingredients_json" not in gousto_all.columns:
-        st.info(
-            "No ingredient data yet. The scraper started capturing ingredient "
-            "lists on 2026-05-31; data will appear here from the next scrape "
-            "onwards."
-        )
+    if gousto_all.empty:
+        st.info("No Gousto data yet.")
     else:
-        # Restrict to rows with ingredients (old scrapes pre-dating ingredient
-        # capture have an empty / missing ingredients_json)
-        has_ings = gousto_all["ingredients_json"].fillna("").astype(str).str.len() > 2
-        gi = gousto_all[has_ings].copy()
-        if gi.empty:
-            st.info(
-                "No ingredient data in any of the loaded CSVs yet. Run the "
-                "scraper once after 2026-05-31 to populate this tab."
-            )
-        else:
+        # Show every recipe — those scraped before ingredient capture (or that
+        # Gousto's detail endpoint returned no ingredients for) appear with an
+        # empty ingredient list rather than being dropped.
+        gi = gousto_all.copy()
+        if "ingredients_json" not in gi.columns:
+            gi["ingredients_json"] = ""
+        gi["ingredients_json"] = gi["ingredients_json"].fillna("")
+        if True:
             weeks = sorted(gi["week"].unique(), reverse=True)
             col_wk, col_ing = st.columns([2, 2])
             with col_wk:
@@ -754,10 +748,16 @@ with tab_ingredients:
                 f["menu_week_start"], errors="coerce"
             ).dt.strftime("%d/%m/%Y")
 
+            n_missing = (f["ingredient_count"] == 0).sum()
+            avg_count_pop = (f.loc[f["ingredient_count"] > 0, "ingredient_count"].mean()
+                             if (f["ingredient_count"] > 0).any() else 0)
+            missing_note = (f" ({n_missing} with no ingredient list)"
+                            if n_missing else "")
             st.caption(
                 f"{len(f):,} recipe(s) shown across "
-                f"{f['week'].nunique()} HelloFresh week(s). Average "
-                f"{f['ingredient_count'].mean():.0f} ingredients per recipe."
+                f"{f['week'].nunique()} HelloFresh week(s){missing_note}. "
+                f"Average {avg_count_pop:.0f} ingredients per recipe "
+                f"(among those with data)."
             )
 
             cols = ["week", "menu_date", "name", "tier",
