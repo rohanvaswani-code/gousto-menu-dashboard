@@ -132,12 +132,40 @@ def fetch_menu(session, url_template, delivery_date, num_portions):
 
 
 # -------------------- COOKBOOK MAP --------------------
+def _current_cookbook_count(session):
+    """Quick peek at the cookbook listing to learn its total count."""
+    try:
+        r = session.get(
+            COOKBOOK_LISTING_API,
+            params={"category": "recipes", "limit": 1, "offset": 0},
+            timeout=10,
+        )
+        if r.status_code == 200:
+            return r.json().get("data", {}).get("count")
+    except Exception:
+        pass
+    return None
+
+
 def build_uuid_to_slug_map(session, use_cache=True):
     if use_cache and SLUG_CACHE.exists():
         try:
             mapping = json.loads(SLUG_CACHE.read_text())
-            print(f"-> loaded {len(mapping)} cached UUID->slug mappings")
-            return mapping
+            cookbook_count = _current_cookbook_count(session)
+            if cookbook_count is None:
+                print(f"-> loaded {len(mapping)} cached UUID->slug mappings "
+                      f"(couldn't check freshness)")
+                return mapping
+            # If cache is missing >2% of the current cookbook, rebuild — new
+            # recipes added since the cache was built won't have slugs
+            # otherwise, and their ingredient lists go blank in the dashboard.
+            shortfall = (cookbook_count - len(mapping)) / cookbook_count
+            if shortfall <= 0.02:
+                print(f"-> loaded {len(mapping)} cached UUID->slug mappings "
+                      f"(cookbook has {cookbook_count}; cache is fresh)")
+                return mapping
+            print(f"-> cache stale ({len(mapping)} cached vs {cookbook_count} "
+                  f"in cookbook, {shortfall*100:.1f}% missing) — rebuilding")
         except Exception:
             pass
 
