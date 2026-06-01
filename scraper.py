@@ -10,6 +10,7 @@ import json
 import re
 import sys
 import time
+import unicodedata
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -225,6 +226,22 @@ def build_uuid_to_slug_map(session, use_cache=True):
     return mapping
 
 
+_SLUG_NON_ALNUM = re.compile(r"[^a-z0-9]+")
+
+
+def derive_slug_from_name(name):
+    """Best-effort slug guess for recipes missing from the cookbook listing.
+    Gousto's URL slugs are kebab-case ascii of the recipe name, so e.g.
+    'Beef Spaghetti Bolognese' -> 'beef-spaghetti-bolognese'. Empirically
+    matches Gousto's actual slug for most menu-but-not-in-cookbook recipes."""
+    if not name:
+        return None
+    # Strip diacritics and non-ASCII (catches '�' replacement chars too)
+    ascii_name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode("ascii")
+    slug = _SLUG_NON_ALNUM.sub("-", ascii_name.lower()).strip("-")
+    return slug or None
+
+
 def fetch_recipe_detail(session, slug):
     try:
         r = session.get(RECIPE_DETAIL_API.format(slug=slug), timeout=15)
@@ -387,6 +404,15 @@ def scrape_week(session, url_template, weeks_ahead, uuid_to_slug, num_portions, 
     for i, (rid, menu_r) in enumerate(menu_recipes.items(), 1):
         slug = uuid_to_slug.get(rid)
         detail = fetch_recipe_detail(session, slug) if slug else None
+        # Fallback: some menu recipes aren't in the cookbook listing at all
+        # (Gousto staples and some new SKUs). Guess the slug from the recipe
+        # name — empirically matches Gousto's URL pattern for most of them.
+        if not detail:
+            guessed = derive_slug_from_name(menu_r.get("name", ""))
+            if guessed and guessed != slug:
+                detail = fetch_recipe_detail(session, guessed)
+                if detail:
+                    uuid_to_slug[rid] = guessed  # cache for any future weeks
         if detail and detail.get("data", {}).get("entry", {}).get("nutritional_information"):
             matched += 1
         rows.append(make_row(rid, menu_r, detail, week_start, scraped_at))
