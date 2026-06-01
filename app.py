@@ -730,25 +730,33 @@ with tab_ingredients:
 
             # Parse the JSON into a list of label strings per recipe. Gousto's
             # label format is "<name> (<qty><unit>) x<packs>" where 'packs' is
-            # the count of standard packs at the requested portion size. x0
-            # and x1 are noise (qty is already in parentheses, or it's just
-            # one pack) — strip those so only meaningful multi-pack counts
-            # like 'x2' survive.
+            # the count of standard packs at the requested portion size:
+            #   x0  = ingredient not delivered as a separate pack (qty already
+            #         baked into another item; common in 2-meals-in-1 bundles).
+            #         Drop these — they're sub-recipe accounting, not what the
+            #         customer actually receives.
+            #   x1  = exactly one pack at the standard size. Strip the suffix
+            #         (it's the implicit default).
+            #   x2+ = multiple packs. Keep the suffix so quantity is clear.
             _trailing_pack = re.compile(r"\s*x\s*(\d+)\s*$")
 
             def _clean(label):
                 m = _trailing_pack.search(label)
                 if not m:
                     return label.strip()
-                if int(m.group(1)) <= 1:
+                count = int(m.group(1))
+                if count == 0:
+                    return None  # signal: drop this ingredient
+                if count == 1:
                     return _trailing_pack.sub("", label).strip()
                 return label.strip()
 
             def _parse(js):
                 try:
                     arr = json.loads(js) if js else []
-                    return [_clean(i.get("label") or i.get("name") or "")
-                            for i in arr]
+                    cleaned = [_clean(i.get("label") or i.get("name") or "")
+                               for i in arr]
+                    return [c for c in cleaned if c]  # drop None / empty
                 except (json.JSONDecodeError, TypeError):
                     return []
             f["_ing_labels"] = f["ingredients_json"].apply(_parse)
