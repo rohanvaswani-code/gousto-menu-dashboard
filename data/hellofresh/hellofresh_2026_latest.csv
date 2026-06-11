@@ -1,0 +1,721 @@
+week,slot_number,brand,recipe_title,person_size,calories,grams
+2026-W19,1,HelloFresh,Quick Butter Chicken Masala,2,3102,581
+2026-W19,2,HelloFresh,"Hoisin Beef, Pork and Mixed Veg Stir-Fry",2,2964,352.5
+2026-W19,3,HelloFresh,Banging Bangers and Garlic Mash,2,2317,694
+2026-W19,4,HelloFresh,Teriyaki Sesame Glazed Chicken Thighs,2,2824,607.5
+2026-W19,5,HelloFresh,Spiced Pork Pilaf and Mango Chutney,2,3717,673.5
+2026-W19,6,HelloFresh,Sticky Sweet Chilli Halloumi Burger,2,4737,701.5
+2026-W19,7,HelloFresh,Toss in the Teriyaki Chicken Tacos,2,3177,585.9
+2026-W19,8,HelloFresh,Family Favourite Peanut Butternut Coconut Curry,2,3586,812.5
+2026-W19,9,HelloFresh,Indonesian Inspired Pork Skewers in Sambal Sauce,2,3435,551.5
+2026-W19,10,HelloFresh,Ayam Goreng Style Fried Chicken,2,3570,585.6
+2026-W19,11,HelloFresh,Cơm Tấm Inspired Sweet Spiced Pork and Jasmine Rice,2,2304,630
+2026-W19,12,HelloFresh,Lemongrass and Sambal Beef Larb Style Salad,2,2479,483
+2026-W19,13,HelloFresh,"Warming Ginger, Cauliflower and Coconut Bowl",2,2581,554.5
+2026-W19,14,HelloFresh,Vietnamese Cà Ri Chay Inspired Butternut Noodles,2,2667,709.8
+2026-W19,15,HelloFresh,Sausage and Purple Sprouting Broccoli Tart,2,5575,581.4
+2026-W19,16,HelloFresh,Persian Khoresh Rivas Style Lamb and Rhubarb Stew,2,2910,464.7
+2026-W19,17,HelloFresh,Thai Red Coconut Beef Meatball Curry,2,3262,766.8
+2026-W19,18,HelloFresh,Peri Peri Chicken and Aioli Ciabatta Sandwich,2,4489,663.3
+2026-W19,19,HelloFresh,Purple Sprouting Broccoli & Spiced Butter Bean Bowl,2,2857,602.8
+2026-W19,20,HelloFresh,"Spring Veg, Chickpea and Pickled Rhubarb Salad",2,3427,687
+2026-W19,21,HelloFresh,Chả Cá Thăng Long Inspired Salmon,2,3245,464.2
+2026-W19,22,HelloFresh,Lemon and Herb Barramundi in Garlic Butter,2,2290,633.3
+2026-W19,23,HelloFresh,Fragrant Teriyaki Prawn Stir-Fry,2,1852,390
+2026-W19,24,HelloFresh,Smoky Spiced King Prawn Spaghetti,2,2484,473.8
+2026-W19,25,HelloFresh,Handmade Spiced Fish Cakes,2,3209,640
+2026-W19,26,HelloFresh,Scrub a Dub Beef Cottage Pie and Cheesy Mash,2,2758,791.3
+2026-W19,27,HelloFresh,Super Quick Lemongrass Chicken Noodles,2,2113,387.5
+2026-W19,28,HelloFresh,15 Minute Coronation Chicken,2,2965,401.3
+2026-W19,29,HelloFresh,Super Quick Chermoula Spiced Beef and Couscous,2,3025,518
+2026-W19,30,HelloFresh,"Mommy's One Pot Sausage, Bean & Mushroom Cassoulet",2,2505,517.4
+2026-W19,31,HelloFresh,Cheesy Beef Mince Ragu,2,2979,453.9
+2026-W19,32,HelloFresh,Easy Spanish Style Chicken Traybake,2,3152,615.4
+2026-W19,33,HelloFresh,Jerk Spiced Pork and Black Bean Bowl,2,3485,690
+2026-W19,34,HelloFresh,21 Day Aged Rump Steak and Peri Peri Potatoes,2,2582,651.8
+2026-W19,35,HelloFresh,Speedy Spicy Cajun Chicken Macaroni,2,3312,469.3
+2026-W19,36,HelloFresh,Moroccan Style Lamb and Couscous,2,2763,588.5
+2026-W19,37,HelloFresh,Speedy Lamb and Mushroom Spag Bol,2,2892,605
+2026-W19,38,HelloFresh,Chermoula Chicken Loaded Naan,2,4554,551.8
+2026-W19,39,HelloFresh,Weeknight Fragrant Hoisin Pork Noodles,2,3310,480
+2026-W19,40,HelloFresh,Pronto Bacon and Mushroom Linguine,2,2961,432.9
+2026-W19,41,HelloFresh,Quick Peri Peri Chicken Couscous Bowl,2,2908,586.8
+2026-W19,42,HelloFresh,Italian Inspired Butter Bean Cassoulet,2,2472,578.9
+2026-W19,43,HelloFresh,Spiced Roasted Cauliflower on Zhoug Couscous,2,2255,487.5
+2026-W19,44,HelloFresh,Speedy Creamy Brazilian Style Chickpeas,2,3194,743.8
+2026-W19,45,HelloFresh,Arrabbiata Style Pumpkin and Sage Girasoli,2,2519,415.4
+2026-W19,46,HelloFresh,Quick Creamy Truffle and Mushroom Rigatoni,2,2824,383.5
+2026-W19,47,HelloFresh,Sweet Potato Pasanda Spiced Curry,2,4185,728.8
+2026-W19,48,HelloFresh,Hot and Spicy Halloumi and Chilli-Tomato Relish,2,3654,641
+2026-W19,49,HelloFresh,Charred Cabbage and Thai Style Nam Jim Dressing,2,2870,605.8
+2026-W19,50,HelloFresh,Singapore Style Crispy Tofu & Black Pepper Noodles,2,2652,488.8
+2026-W19,51,HelloFresh,Spanakopita Inspired Sigara Böreği,2,4296,568.3
+2026-W19,52,HelloFresh,Quick Roasted Broccoli Blue Cheese Salad,2,1919,501
+2026-W19,53,HelloFresh,Hearty Double Mushroom Bourguignon,2,2051,657.3
+2026-W19,54,HelloFresh,Crispy Serrano Caprese Bruschetta,2,2021,416
+2026-W19,55,HelloFresh,Middle Eastern Style Lamb Meatballs in Cherry Sauce,2,2382,574.3
+2026-W19,56,HelloFresh,One Pot Ginger and Lime Chicken Noodle Soup,2,2191,653.2
+2026-W19,57,HelloFresh,Clean Plate Chicken Schnitzel & Miso Butter Sauce,2,2763,659.9
+2026-W19,58,HelloFresh,Chermoula Spiced Chicken in Smoky Sauce,2,2712,658
+2026-W19,59,HelloFresh,Fragrant Ginger Beef Noodle Stir-Fry,2,2491,395.3
+2026-W19,60,HelloFresh,Thai Green Style Chicken Curry,2,2550,434.2
+2026-W19,61,HelloFresh,Peri Peri Spiced Tuna Fish Cakes,2,2553,682.5
+2026-W19,62,HelloFresh,Lemon & Herb Crusted Basa and Chive Butter Sauce,2,2551,617
+2026-W19,63,HelloFresh,Teriyaki Duck Rice Bowl,2,3459,673
+2026-W19,64,HelloFresh,Bavarian Style Pork Belly and Homemade Apple Sauce,2,2463,828.4
+2026-W19,65,HelloFresh,Peri Peri Chicken Burger and Wedges,2,4801,721.3
+2026-W19,66,HelloFresh,Herby Creamy Tomato Chicken Penne,2,2920,495.4
+2026-W19,67,HelloFresh,Sticky Honey Indonesian Style Beef Rice Bowl,2,2555,409.3
+2026-W19,68,HelloFresh,Tex-Mex Style Pork Mince Tacos,2,3944,542.8
+2026-W19,69,HelloFresh,Chermoula Lamb Koftas and Balsamic Fig Sauce,2,2356,526.3
+2026-W19,70,HelloFresh,Speedy Chipotle Bean Chilli,2,3138,667.5
+2026-W19,71,HelloFresh,Presto Pesto Pea Rigatoni,2,3207,418.5
+2026-W19,72,HelloFresh,Easy Pulled Beef Ragu and Fresh Tagliatelle,2,4519,683.5
+2026-W19,73,HelloFresh,21 Day Aged Sirloin Steak and Cheesy Rosemary Chips,2,2923,530.5
+2026-W19,74,HelloFresh,Seared Sea Bream on Orkney Crab and Tomato Risotto,2,4558,831.5
+2026-W19,75,HelloFresh,Sweet Chilli Beef and Pickled Cucumber Bao,2,3133,634.3
+2026-W19,76,HelloFresh,Chinese BBQ Style Ribs & Hoisin King Prawn Fried Rice,2,4098,694
+2026-W19,77,HelloFresh,Lamb Steak in Garlic Butter Sauce,2,3606,729
+2026-W19,78,HelloFresh,Vietnamese Style Tamarind Glazed Duck Bánh Mì,2,4647,755
+2026-W19,79,HelloFresh,Parmigiano Reggiano Crumbed Chicken Schnitzel,2,3037,682.5
+2026-W19,80,HelloFresh,Ultimate Matar Saag Paneer and Garlic Naan,2,6758,790.5
+2026-W20,1,HelloFresh,Chicken in Creamy Peppercorn Sauce,2,2358,723.3
+2026-W20,2,HelloFresh,Korean Style Gochujang Beef and Pork Bibimbap,2,2976,587
+2026-W20,3,HelloFresh,Presto Bacon and Mushroom Linguine,2,2921,352.5
+2026-W20,4,HelloFresh,Comforting Coronation Chicken Curry,2,2840,626.5
+2026-W20,5,HelloFresh,Honey Mustard Sausages and Creamy Potato Gratin,2,3631,889
+2026-W20,6,HelloFresh,Pronto Pesto Pasta Verde,2,3717,410.3
+2026-W20,7,HelloFresh,Smoky BBQ Pulled Chicken Buns,2,4053,687.9
+2026-W20,8,HelloFresh,Family Favourite Honey-Soy Crispy Chicken,2,2608,588
+2026-W20,9,HelloFresh,Fast Fragrant Vietnamese Style Chicken Salad,2,2636,435
+2026-W20,10,HelloFresh,Thai Style Spiced Chicken and Satay Sauce,2,3853,601
+2026-W20,11,HelloFresh,Quick Indonesian Inspired Pork Noodles,2,2991,406.8
+2026-W20,12,HelloFresh,Fragrant Sach Ko Ang Inspired Beef Kofta Baguette,2,3623,445.5
+2026-W20,13,HelloFresh,Indonesian Gado Gado Inspired Salad,2,2622,619.5
+2026-W20,14,HelloFresh,South East Asian Inspired Chickpea Curry,2,4007,790.2
+2026-W20,15,HelloFresh,Pork Steak and Sweet & Sour Ginger Rhubarb Sauce,2,2478,548.5
+2026-W20,16,HelloFresh,Purple Sprouting Broccoli and Chorizo Jam Rigatoni,2,3202,562.5
+2026-W20,17,HelloFresh,Sticky Thai Style Pork Rice Bowl,2,2967,524.5
+2026-W20,18,HelloFresh,Peri Peri Spiced Chorizo and Chickpea Traybake,2,2786,747.3
+2026-W20,19,HelloFresh,"Sour Rhubarb, Cinnamon and Lentil Curry",2,3397,902.5
+2026-W20,20,HelloFresh,Purple Sprouting Broccoli and Courgette Risotto,2,2773,727.8
+2026-W20,21,HelloFresh,Caribbean Style Spiced Salmon,2,2642,499.8
+2026-W20,22,HelloFresh,German Inspired Haddock in Mustard Cream Sauce,2,2328,509.5
+2026-W20,23,HelloFresh,Traybake Prawn and Pepper Fajitas,2,2790,565.5
+2026-W20,24,HelloFresh,Peanut and Prawn Noodle Stir-Fry,2,2062,451
+2026-W20,25,HelloFresh,"Lemon, Parsley and White Wine Moules Frites",2,2692,659.3
+2026-W20,26,HelloFresh,Cheesy Piggy Pie and Peas,2,3456,833.5
+2026-W20,27,HelloFresh,One Pan Gochujang Beef Udon,2,2082,460
+2026-W20,28,HelloFresh,15 Minute Fragrant Peanut Chicken Curry,2,2958,476.1
+2026-W20,29,HelloFresh,Super Quick Chorizo and Bean Stew,2,2246,510.9
+2026-W20,30,HelloFresh,'Nduja and Red Pepper Ravioli Arrabbiata,2,2723,388.8
+2026-W20,31,HelloFresh,"Sausage, Sage and Butternut Rigatoni",2,4108,511.3
+2026-W20,32,HelloFresh,Fuss-Free Tandoori Inspired Chicken Traybake,2,3247,691
+2026-W20,33,HelloFresh,Pesto Chicken Traybake and Garlic Rice,2,2784,560.4
+2026-W20,34,HelloFresh,21 Day Aged Rump Steak and Oregano Roast Potatoes,2,2512,570.8
+2026-W20,35,HelloFresh,"Super Quick Spaghetti, Beef and Mushroom Ragu",2,2946,419.9
+2026-W20,36,HelloFresh,Squeaky Clean Up Lamb Tagine,2,3102,578.5
+2026-W20,37,HelloFresh,Peri Peri Chicken Fajita Style Tacos,2,3185,460.3
+2026-W20,38,HelloFresh,Easy Peasy Teriyaki Sambal Chicken,2,2294,436.8
+2026-W20,39,HelloFresh,Spring Clean Up Cajun Spiced Chorizo and Leek Orzo,2,3244,419.3
+2026-W20,40,HelloFresh,Speedy Beef and Red Wine Open Pie,2,2340,589.5
+2026-W20,41,HelloFresh,Roasted Chicken Thighs and Cheesy Leek Sauce,2,3243,627.9
+2026-W20,42,HelloFresh,Cheesy Harissa Fritter Burger and Chips,2,3981,819.8
+2026-W20,43,HelloFresh,Rich and Creamy Veggie 'Nduja Tortelloni,2,2663,432.5
+2026-W20,44,HelloFresh,Yi Mein Inspired Longevity Noodles,2,2101,355.5
+2026-W20,45,HelloFresh,Veggie Peanut Noodle Stir-Fry,2,2291,364.5
+2026-W20,46,HelloFresh,Hearty Lentil and Mushroom Cottage Pie,2,2989,731.4
+2026-W20,47,HelloFresh,Butternut Squash Masala,2,3105,877.5
+2026-W20,48,HelloFresh,Glazed Halloumi and Gochujang Coconut Curry,2,3688,474.5
+2026-W20,49,HelloFresh,Cheesy Veggie Mince Quesadillas,2,3809,610.4
+2026-W20,50,HelloFresh,"Coconut, Ginger and Lemongrass Tofu Bowl",2,3147,567
+2026-W20,51,HelloFresh,Chermoula Spiced Butter Bean Salad,2,2346,481.5
+2026-W20,52,HelloFresh,Honey Mustard Roasted Radish Gyros Style Flatbreads,2,2426,530
+2026-W20,53,HelloFresh,Smoky Ratatouille Stuffed Courgette,2,2054,745.3
+2026-W20,54,HelloFresh,"Wham, Bam, One Pan Hoisin Pork Udon",2,2463,410.5
+2026-W20,55,HelloFresh,Homemade Lamb Keema Pau,2,2696,526
+2026-W20,56,HelloFresh,Chicken Gyros Inspired Bulgur Bowl,2,2729,537
+2026-W20,57,HelloFresh,Peri Peri Honey and Lime Chicken Skewers,2,2280,557.8
+2026-W20,58,HelloFresh,Thyme Roasted Chicken Breast and Gravy,2,2978,968.3
+2026-W20,59,HelloFresh,Classic Lamb Shepherd's Pie,2,2232,633
+2026-W20,60,HelloFresh,Scrub Club Coconut Chicken Curry,2,2660,593
+2026-W20,61,HelloFresh,North Indian Inspired Lamb Koftas and Mint Yoghurt,2,2508,544.8
+2026-W20,62,HelloFresh,Soy Barramundi and Garlic Rice,2,2556,676.3
+2026-W20,63,HelloFresh,Honey Gochujang Pulled Chicken Rice Bowl,2,2947,513.5
+2026-W20,64,HelloFresh,Chipotle Ribs and Loaded Cheese Smashed Potatoes,2,3908,720
+2026-W20,65,HelloFresh,Peri Peri Chicken Burger and Wedges,2,4420,656.3
+2026-W20,66,HelloFresh,Herby Creamy Tomato Chicken Penne,2,2920,495.4
+2026-W20,67,HelloFresh,Sticky Honey Indonesian Style Beef Rice Bowl,2,2591,371.8
+2026-W20,68,HelloFresh,Tex-Mex Style Pork Mince Tacos,2,3944,542.8
+2026-W20,69,HelloFresh,Chermoula Lamb Koftas and Balsamic Fig Sauce,2,2356,526.3
+2026-W20,70,HelloFresh,Speedy Chipotle Bean Chilli,2,3138,667.5
+2026-W20,71,HelloFresh,Presto Pesto Pea Rigatoni,2,3207,418.5
+2026-W20,72,HelloFresh,Teriyaki Glazed Salmon on Fragrant Coriander Rice,2,5542,799
+2026-W20,73,HelloFresh,Smoky Creamy Chipotle Pulled Pork Tagliatelle,2,6626,785
+2026-W20,74,HelloFresh,Rosemary Roast Lamb and Red Wine Jus,2,4562,1216.3
+2026-W20,75,HelloFresh,21 Day Aged Sirloin Steak and Creamy Tarragon Sauce,2,3387,601.6
+2026-W20,76,HelloFresh,Herby Lamb Steak and Garlic Butter,2,2453,525.5
+2026-W20,77,HelloFresh,Mussel & King Prawn Tagliatelle and Garlic Baguette,2,4707,761.8
+2026-W20,78,HelloFresh,Crispy Cajun Spiced Chicken and Bacon Burger,2,5826,818.5
+2026-W20,79,HelloFresh,Ultimate Butter Chicken and Garlic-Coriander Naan,2,5368,805.3
+2026-W20,80,HelloFresh,Glazed Halloumi and Jewelled Pearl Couscous Salad,2,5781,819.5
+2026-W21,1,HelloFresh,Speedy Chipotle Chicken Penne,2,3070,523.5
+2026-W21,2,HelloFresh,Hachis Parmentier,2,2862,635.5
+2026-W21,3,HelloFresh,Family Favourite Pork and Apple Burger,2,3762,507.1
+2026-W21,4,HelloFresh,Easy Chicken à la Normande,2,4135,720.5
+2026-W21,5,HelloFresh,Honey Mustard Sausage Traybake,2,3093,727.5
+2026-W21,6,HelloFresh,Roasted Vegetable Lasagne,2,2944,602.3
+2026-W21,7,HelloFresh,Chorizo Crusted Baked Penne,2,4044,454.9
+2026-W21,8,HelloFresh,Family Favourite Hoisin Beef Noodle Stir-Fry,2,2741,458.8
+2026-W21,9,HelloFresh,Indonesian Inspired Pork Skewers in Sambal Sauce,2,3435,551.5
+2026-W21,10,HelloFresh,Ayam Goreng Style Fried Chicken,2,3570,585.6
+2026-W21,11,HelloFresh,Cơm Tấm Inspired Sweet Spiced Pork and Jasmine Rice,2,2304,629.8
+2026-W21,12,HelloFresh,Lemongrass and Sambal Beef Larb Style Salad,2,2479,483
+2026-W21,13,HelloFresh,Fajita Flavours Spinach & Ricotta Tortelloni,2,3531,458.5
+2026-W21,14,HelloFresh,Vietnamese Cà Ri Chay Inspired Butternut Noodles,2,2667,709.8
+2026-W21,15,HelloFresh,Chorizo and Purple Sprouting Broccoli Lentil Bowl,2,2801,680.5
+2026-W21,16,HelloFresh,Crispy Chicken and Herby Jersey Royal Potato Salad,2,2798,588
+2026-W21,17,HelloFresh,Thai Red Coconut Beef Meatball Curry,2,3267,766.8
+2026-W21,18,HelloFresh,Pan-Fried Gammon and Charred Pineapple Rings,2,2635,652.5
+2026-W21,19,HelloFresh,Purple Sprouting Broccoli & Spiced Bean Bowl,2,2816,597.8
+2026-W21,20,HelloFresh,"Spring Veg, Chickpea and Pickled Rhubarb Salad",2,3427,687
+2026-W21,21,HelloFresh,Chả Cá Thăng Long Inspired Salmon,2,3195,464.2
+2026-W21,22,HelloFresh,Belgian Style Haddock in Caper Meunière Sauce,2,2618,523
+2026-W21,23,HelloFresh,Chipotle-Mango Prawn Bulgur Bowl,2,2107,588.8
+2026-W21,24,HelloFresh,Thai Style Coconut Prawn Noodle Soup,2,2350,522
+2026-W21,25,HelloFresh,Homemade Cheesy Fishcakes,2,3187,549.8
+2026-W21,26,HelloFresh,"Sausage & Apple Meatballs, Mash and Gravy",2,2932,689
+2026-W21,27,HelloFresh,Easy Peasy Greek Style Chicken Bowl,2,4651,579.5
+2026-W21,28,HelloFresh,15 Minute Thai Green Style Chicken Curry,2,2653,433.2
+2026-W21,29,HelloFresh,Super Quick Chorizo and Tomato Spaghetti,2,2951,316.3
+2026-W21,30,HelloFresh,Speedy Sausage Linguine,2,3612,537.5
+2026-W21,31,HelloFresh,Honey Glazed Sausage Bake and Bravas Inspired Sauce,2,2954,663.9
+2026-W21,32,HelloFresh,Fuss-Free Cheesy Marinara Chicken Bake,2,2256,561.4
+2026-W21,33,HelloFresh,Fuss-Free Teriyaki Chicken Traybake,2,2501,515.2
+2026-W21,34,HelloFresh,21 Day Aged Rump Steak and Caesar Style Salad,2,2199,485.8
+2026-W21,35,HelloFresh,"Quick Chicken, Pea and Spinach Korma",2,3432,468.5
+2026-W21,36,HelloFresh,Chermoula Chicken and Sour Cherry Cabbage Bulgur,2,3649,557.5
+2026-W21,37,HelloFresh,Dry Laksa Goreng Style Chicken Noodles,2,4081,577
+2026-W21,38,HelloFresh,Quick Hot Honey Peri Peri Chicken and Pepper Tacos,2,3932,619.7
+2026-W21,39,HelloFresh,Speedy Porky Penne,2,3645,578.9
+2026-W21,40,HelloFresh,"Lamb, Sweet Potato and Lentil Rogan Josh",2,3594,610.8
+2026-W21,41,HelloFresh,Quick Brazilian Style Roast Chicken and Chickpeas,2,3288,788.3
+2026-W21,42,HelloFresh,"Mozzarella, Charred Courgette and Tomato Pizza",2,4734,807.4
+2026-W21,43,HelloFresh,Mumbai Chilli Cheese Inspired Toastie,2,3418,476
+2026-W21,44,HelloFresh,One Pot Creamy Leek and Bean Pesto Soup,2,3151,579.3
+2026-W21,45,HelloFresh,Spicy Cajun Tomato & Super Greens Rigatoni,2,2952,390.7
+2026-W21,46,HelloFresh,Creamy Chickpea Korma,2,3733,532.5
+2026-W21,47,HelloFresh,Chipotle Lentil and Mushroom Enchiladas,2,3139,502
+2026-W21,48,HelloFresh,Pan-Fried Halloumi and Pesto Drizzle,2,2961,599
+2026-W21,49,HelloFresh,Charred Cabbage and Thai Style Nam Jim Dressing,2,2870,605.8
+2026-W21,50,HelloFresh,"Spiced Tofu, Sweet Potato and Avocado Salad",2,3360,660.8
+2026-W21,51,HelloFresh,Pumpkin and Sage Girasoli in Veggie 'Nduja Sauce,2,2177,427
+2026-W21,52,HelloFresh,Mozzarella and Roasted Butternut Squash Panzanella,2,2516,598.4
+2026-W21,53,HelloFresh,Hearty Ratatouille Inspired Orzo,2,2544,704.2
+2026-W21,54,HelloFresh,Speedy Spiced Chicken Udon,2,2106,464.3
+2026-W21,55,HelloFresh,Creamy Spiced Lentil and Chicken Curry,2,2392,525
+2026-W21,56,HelloFresh,Speedy Italian Style Pesto Chicken,2,2287,594.5
+2026-W21,57,HelloFresh,Crispy Chicken Thai Green Style Caesar Salad,2,2470,465
+2026-W21,58,HelloFresh,Family Favourite Thyme Roasted Chicken,2,2345,709.8
+2026-W21,59,HelloFresh,Beef and Beany Quesadillas,2,2401,414
+2026-W21,60,HelloFresh,"Bacon, Bean and Red Wine Cassoulet",2,2379,661
+2026-W21,61,HelloFresh,Tandoori Chicken Traybake,2,2303,546.3
+2026-W21,62,HelloFresh,Basa and Sweet Onion Green Tikka Masala,2,2723,692.3
+2026-W21,63,HelloFresh,Confit Duck Leg and Caramelised Leek Jus,2,3493,945.5
+2026-W21,64,HelloFresh,Sticky Mustard Pork Belly and Red Wine Jus,2,3365,675
+2026-W21,65,HelloFresh,Peri Peri Chicken Burger and Chips,2,4420,656.3
+2026-W21,66,HelloFresh,Herby Creamy Tomato Chicken Penne,2,2920,495.4
+2026-W21,67,HelloFresh,Sticky Honey Indonesian Style Beef Rice Bowl,2,2555,409.3
+2026-W21,68,HelloFresh,Tex-Mex Style Pork Mince Tacos,2,3944,542.8
+2026-W21,69,HelloFresh,Chermoula Lamb Koftas and Balsamic Fig Sauce,2,2356,526.3
+2026-W21,70,HelloFresh,Speedy Chipotle Bean Chilli,2,3138,667.5
+2026-W21,71,HelloFresh,Presto Pesto Pea Rigatoni,2,3207,418.5
+2026-W21,72,HelloFresh,Sirloin Steak in Café de Paris Style Tarragon Sauce,2,3387,661.5
+2026-W21,73,HelloFresh,"Creamy Lemon, King Prawn and Bacon Linguine",2,3127,539.5
+2026-W21,74,HelloFresh,Pulled Beef Chipotle Chilli Hoagie,2,4324,882
+2026-W21,75,HelloFresh,Walnut Crusted Lamb Steak and Red Wine Jus,2,3764,719.4
+2026-W21,76,HelloFresh,Sea Bream and Lemon-Caper Butter Sauce,2,2157,503.5
+2026-W21,77,HelloFresh,Thai Style Pulled Chicken Bao,2,3128,720
+2026-W21,78,HelloFresh,Chicken and Halloumi Shawarma,2,5097,744.3
+2026-W21,79,HelloFresh,BBQ Jerk Style Chicken and Mango Glazed Sausages,2,3989,771
+2026-W21,80,HelloFresh,Loaded Chermoula Spiced Whole Roasted Cauliflower,2,4346,891.3
+2026-W22,1,HelloFresh,Indonesian Style Spiced Chicken Noodles,2,2214,423.8
+2026-W22,2,HelloFresh,BBQ Beef and Pork Cheeseburger,2,3855,560.8
+2026-W22,3,HelloFresh,"Oven-Baked Bacon, White Wine & Mushroom Risotto",2,2802,668.4
+2026-W22,4,HelloFresh,Rosemary Chicken on Oven-Baked Pea Risotto,2,3293,680.4
+2026-W22,5,HelloFresh,Sweet Chilli Hoisin Beef Noodles,2,2970,434.5
+2026-W22,6,HelloFresh,Mixed Bean Loaded Fries,2,3130,873.5
+2026-W22,7,HelloFresh,"Build Your Own: Fried Chicken Bao, Wedges and Salad",2,3897,806.8
+2026-W22,8,HelloFresh,Family Favourite Pork Polpette Topped Naanizza,2,4410,482.6
+2026-W22,9,HelloFresh,Fast Fragrant Vietnamese Style Chicken Salad,2,2636,435
+2026-W22,10,HelloFresh,Thai Style Spiced Chicken and Satay Sauce,2,3853,601
+2026-W22,11,HelloFresh,Quick Indonesian Inspired Pork Noodles,2,2991,406.8
+2026-W22,12,HelloFresh,Fragrant Sach Ko Ang Inspired Beef Kofta Baguette,2,3628,445.5
+2026-W22,13,HelloFresh,Indonesian Gado Gado Inspired Salad,2,2622,619.5
+2026-W22,14,HelloFresh,South East Asian Inspired Chickpea Curry,2,4019,790.2
+2026-W22,15,HelloFresh,Pork Steak and Sweet & Sour Ginger Rhubarb Sauce,2,2478,548.5
+2026-W22,16,HelloFresh,Purple Sprouting Broccoli and Chorizo Jam Rigatoni,2,3202,562.5
+2026-W22,17,HelloFresh,Sticky Thai Style Pork Rice Bowl,2,2967,524.5
+2026-W22,18,HelloFresh,Harissa Butter Jersey Royal Potato and Bacon Salad,2,2896,455
+2026-W22,19,HelloFresh,Crispy Falafel and Harissa Spiced Rice Bowl,2,3603,649.5
+2026-W22,20,HelloFresh,Creamy Green Pesto Butter Bean Shakshuka,2,3715,828
+2026-W22,21,HelloFresh,Peri Peri Spiced Salmon and Cheesy Chips,2,2630,515.8
+2026-W22,22,HelloFresh,Cheesy Crusted Haddock,2,2971,728.4
+2026-W22,23,HelloFresh,Peanut and Prawn Noodle Stir-Fry,2,2062,451
+2026-W22,24,HelloFresh,Quick Chermoula Prawns and Stir-Fried Veg,2,1895,461.3
+2026-W22,25,HelloFresh,Crispy Jerk Basa Burger and Chips,2,3776,652.3
+2026-W22,26,HelloFresh,Creamy Bacon Linguine Pesto Alfredo,2,3191,471.3
+2026-W22,27,HelloFresh,Super Quick Spicy Middle Eastern Style Chicken,2,4039,581.8
+2026-W22,28,HelloFresh,15 Minute Chicken Tikka Masala,2,3346,475
+2026-W22,29,HelloFresh,Super Quick Pork Cheeseburger Inspired Sloppy Joe,2,3898,409.3
+2026-W22,30,HelloFresh,15 Minute Cheesy Bacon Orzo,2,3068,351.3
+2026-W22,31,HelloFresh,Chinese BBQ Style Pork Steak,2,2371,542.5
+2026-W22,32,HelloFresh,Chipotle Chicken Fajita Traybake,2,2081,521.3
+2026-W22,33,HelloFresh,Caribbean Jerk Inspired Chicken Traybake,2,2251,577.3
+2026-W22,34,HelloFresh,21 Day Aged Rump Steak and Creamy Cajun Rigatoni,2,3382,432.3
+2026-W22,35,HelloFresh,Quick Chicken and Pesto Cream Sauce,2,3176,722.5
+2026-W22,36,HelloFresh,Creamy Pesto Ham Tortelloni,2,2990,440.7
+2026-W22,37,HelloFresh,Gyros Inspired Sweet Chilli Chicken Flatbread,2,4119,526.5
+2026-W22,38,HelloFresh,Sweet and Sticky Korean Style Chicken Stir-Fry,2,2716,576
+2026-W22,39,HelloFresh,Super Quick Teriyaki Pork,2,3116,407.5
+2026-W22,40,HelloFresh,Sausages and Smoky Bean Casserole,2,3002,625.7
+2026-W22,41,HelloFresh,Quick Warming Chettinad Style Chicken Curry,2,3419,572
+2026-W22,42,HelloFresh,Cheesy Loaded Veggie Nachos,2,4069,648.3
+2026-W22,43,HelloFresh,Peanut-Sesame Charred Hispi Cabbage Bowl,2,3903,856.8
+2026-W22,44,HelloFresh,Warming Indian Style Spiced Charred Corn Dal,2,3688,659.5
+2026-W22,45,HelloFresh,"Simple Lemon, Leek and Pea Linguine",2,3513,479
+2026-W22,46,HelloFresh,Spinach and Ricotta Tortelloni in Spicy Cajun Sauce,2,2980,467.3
+2026-W22,47,HelloFresh,Mexican Style Roasted Veg Salad,2,2653,500
+2026-W22,48,HelloFresh,Halloumi Thai Red Style Curry,2,3550,408.2
+2026-W22,49,HelloFresh,Classic Meat-Free Mince Lasagne,2,3710,576.5
+2026-W22,50,HelloFresh,Palak Tofu Curry and Basmati Rice,2,3698,637.3
+2026-W22,51,HelloFresh,Rosé Style Linguine and TABASCO® Sauce Drizzle,2,2983,539.3
+2026-W22,52,HelloFresh,Baked Goat's Cheese & Caramelised Onion Naanizza,2,2452,288.5
+2026-W22,53,HelloFresh,Sweet Potato and Refried Bean Burrito Bowl,2,2560,491.3
+2026-W22,54,HelloFresh,Sambal Teriyaki Chicken Stir-Fry,2,2182,422.5
+2026-W22,55,HelloFresh,Speedy Tomato Cajun Chicken,2,2336,565.3
+2026-W22,56,HelloFresh,Easy Hoisin Chicken Noodles,2,2174,401
+2026-W22,57,HelloFresh,Butterflied Chicken and Passion Fruit Hot Sauce,2,2363,591
+2026-W22,58,HelloFresh,Turkish Inspired Chicken and Toasted Tomato Bulgur,2,2198,585.9
+2026-W22,59,HelloFresh,Italian Style Sausage and Ditali Pasta Soup,2,2420,634.9
+2026-W22,60,HelloFresh,Naked Beef Burger in Creamy Truffle Sauce,2,2455,505.3
+2026-W22,61,HelloFresh,Crispy Chicken and Black Garlic Rice,2,2864,641.3
+2026-W22,62,HelloFresh,Quick Basa and Mediterranean Style Pearl Couscous,2,2539,514.8
+2026-W22,63,HelloFresh,Lamb Steak in Lemon-Garlic Butter,2,2278,541.9
+2026-W22,64,HelloFresh,BBQ Pulled Duck Burger,2,5248,708
+2026-W22,65,HelloFresh,Peri Peri Chicken Burger and Wedges,2,4420,656.3
+2026-W22,66,HelloFresh,Herby Creamy Tomato Chicken Penne,2,2920,495.4
+2026-W22,67,HelloFresh,Sticky Honey Indonesian Style Beef Rice Bowl,2,2555,409.3
+2026-W22,68,HelloFresh,Tex-Mex Style Pork Mince Tacos,2,3944,542.8
+2026-W22,69,HelloFresh,Chermoula Lamb Koftas and Balsamic Fig Sauce,2,2356,526.3
+2026-W22,70,HelloFresh,Speedy Chipotle Bean Chilli,2,3149,667.5
+2026-W22,71,HelloFresh,Presto Pesto Pea Rigatoni,2,3218,418.5
+2026-W22,72,HelloFresh,Pan-Seared Lamb Steak and Homemade Salsa Verde,2,2559,778.4
+2026-W22,73,HelloFresh,"Creamy Orkney Crab, Samphire and King Prawn Linguine",2,3132,489.5
+2026-W22,74,HelloFresh,21 Day Aged Sirloin and Cheesy Bacon Hasselbacks,2,3570,561
+2026-W22,75,HelloFresh,Chipotle Pulled Chicken and Chorizo Quesadillas,2,6398,815.4
+2026-W22,76,HelloFresh,Indonesian Style Chicken and King Prawn Fried Rice,2,2371,691.8
+2026-W22,77,HelloFresh,Ultimate Smoky Pulled Pork Mac & Cheese,2,6945,775
+2026-W22,78,HelloFresh,Ultimate Fish and Chips,2,2979,573.5
+2026-W22,79,HelloFresh,Crispy Chicken Burger and Chorizo Jam,2,7168,714.3
+2026-W22,80,HelloFresh,Honey Halloumi Tacos and Sweet Potato Wedges,2,5085,756.8
+2026-W23,1,HelloFresh,Oven-Baked Glazed Paprika Chicken,2,2771,695.4
+2026-W23,2,HelloFresh,"Hoisin Beef, Pork and Mixed Veg Stir-Fry",2,2873,391
+2026-W23,3,HelloFresh,"Bangers, Mash and Leek & Chive Sauce",2,2585,579.5
+2026-W23,4,HelloFresh,Sweet and Sticky Chicken on Rice,2,3396,702.5
+2026-W23,5,HelloFresh,Italian Inspired Sausage Naanizza,2,3723,406.5
+2026-W23,6,HelloFresh,Peri Peri Sweet Potato and Black Bean Enchiladas,2,3603,652.3
+2026-W23,7,HelloFresh,Sweet Chilli Fried Chicken Tortillas,2,4459,722.3
+2026-W23,8,HelloFresh,Family Favourite Beef Bolognese Risotto,2,3395,767.5
+2026-W23,9,HelloFresh,Portuguese Bifana Inspired Pork Sando,2,3376,716.7
+2026-W23,10,HelloFresh,Chicken alla Cacciatora and Roast Potatoes,2,2009,726.9
+2026-W23,11,HelloFresh,Summery Crispy Serrano Ham and Lemon Risotto,2,2195,738.5
+2026-W23,12,HelloFresh,Beef Albóndigas and Butter Bean Stew,2,2768,673.7
+2026-W23,13,HelloFresh,Spanakopita Inspired Sigara Böreği,2,4356,573.3
+2026-W23,14,HelloFresh,Tuscan Ribollita Inspired Soup,2,2796,622
+2026-W23,15,HelloFresh,Butterflied Chicken and Kumato Tomato Salad,2,2588,581
+2026-W23,16,HelloFresh,Roasted Chicken in Red Wine Mushroom Sauce,2,2329,826.4
+2026-W23,17,HelloFresh,Burrito Inspired Cheeseburger,2,3949,604
+2026-W23,18,HelloFresh,Chorizo and Charred Pepper Thin-Crust Pizza,2,3394,465.5
+2026-W23,19,HelloFresh,"Black Garlic, Crispy Kale and Jersey Royal Traybake",2,2435,514.5
+2026-W23,20,HelloFresh,Kumato Tomato and Goat's Cheese Tart,2,4849,472.5
+2026-W23,21,HelloFresh,Salmon and Creamy Mustard-Chive Sauce,2,2536,582
+2026-W23,22,HelloFresh,Salmon in Creamy Cajun Sauce,2,2660,528.8
+2026-W23,23,HelloFresh,Gambas Pil Pil Inspired Prawns,2,1992,587.2
+2026-W23,24,HelloFresh,Quick Creamy Prawn and Pea Rigatoni,2,2834,474.5
+2026-W23,25,HelloFresh,Spaghetti alle Cozze: White Wine Mussel Spaghetti,2,3219,548.8
+2026-W23,26,HelloFresh,Creamy Chicken Curry and Rice,2,3441,695
+2026-W23,27,HelloFresh,Presto Pesto Chicken and Pea Spaghetti,2,3764,415.4
+2026-W23,28,HelloFresh,15 Minute Butter Chicken Masala,2,2921,397.3
+2026-W23,29,HelloFresh,Quick Pork and Peanut West African Style Stew,2,3444,487
+2026-W23,30,HelloFresh,'Nduja Red Pepper Ravioli in Creamy Mushroom Sauce,2,2681,336
+2026-W23,31,HelloFresh,Easy Honey Mustard Sausage & Pear Traybake,2,3031,637.4
+2026-W23,32,HelloFresh,Peri Peri Chicken Fillet Traybake,2,2725,522.3
+2026-W23,33,HelloFresh,Tex-Mex Style Pork and Bean Chilli,2,3706,648.5
+2026-W23,34,HelloFresh,Glazed Rump Steak and Soy Butter Potatoes,2,2438,473.2
+2026-W23,35,HelloFresh,"Bell Pepper, Mushroom and Chorizo Linguine",2,2977,451
+2026-W23,36,HelloFresh,Moroccan Style Chicken and Roast Sweet Potato Stew,2,4183,731.4
+2026-W23,37,HelloFresh,Mediterranean Inspired Chicken and Jewelled Rice,2,3856,618.7
+2026-W23,38,HelloFresh,Sticky Spiced Butterflied Chicken,2,2216,449.8
+2026-W23,39,HelloFresh,Speedy Sausage Rigatoni,2,3233,538
+2026-W23,40,HelloFresh,Beef and Guinness® Chilli Loaded Nachos,2,4427,643.5
+2026-W23,41,HelloFresh,One Pot Hoisin Chicken and Mushroom Udon Broth,2,2721,659.3
+2026-W23,42,HelloFresh,Classic Meat-Free Mince Spag Bol,2,2878,503.9
+2026-W23,43,HelloFresh,Super Quick Coconut Tikka Dal,2,3269,430
+2026-W23,44,HelloFresh,Quick Cheesy Harissa Chickpea Taquitos,2,5029,700.5
+2026-W23,45,HelloFresh,Easy Peasy Pumpkin and Sage Girasoli,2,3194,390
+2026-W23,46,HelloFresh,Creamy Korma Lentils and Sweet Potato,2,3560,652.5
+2026-W23,47,HelloFresh,Cheesy Caramelised Onion and Mushroom Gratin,2,3229,684.5
+2026-W23,48,HelloFresh,Halloumi and Refried Bean Tacos,2,3909,607
+2026-W23,49,HelloFresh,"Butternut, Sage and Blue Cheese Stovetop Risotto",2,3068,968.5
+2026-W23,50,HelloFresh,Anhui Bang Tofu and Cabbage Stir-Fry,2,3488,646.3
+2026-W23,51,HelloFresh,Creamy Double Mushroom Penne,2,2850,439.5
+2026-W23,52,HelloFresh,Quick Sticky Tandoori Spiced Cauliflower Salad,2,2111,585.8
+2026-W23,53,HelloFresh,Sri Lankan Style Cauliflower and Coconut Curry,2,2359,670
+2026-W23,54,HelloFresh,Fragrant Lemongrass Pork and Pepper Stir-Fry,2,2547,554
+2026-W23,55,HelloFresh,Italian Style Pork and Oregano Sausage Meatballs,2,2706,626.4
+2026-W23,56,HelloFresh,Speedy  Gochujang Chicken Noodles,2,2140,367.5
+2026-W23,57,HelloFresh,Quick Greek Style Oregano Chicken Pasta Salad,2,2303,433.5
+2026-W23,58,HelloFresh,Thai Style Chicken Noodles,2,2170,434.5
+2026-W23,59,HelloFresh,Crispy Serrano Ham and Charred Courgette Salad,2,2332,481.4
+2026-W23,60,HelloFresh,Cajun Pork and Veg on Herby Bulgur,2,2676,494.8
+2026-W23,61,HelloFresh,Mexican Style Chicken and Charred Veg Salad,2,2858,499.8
+2026-W23,62,HelloFresh,Baked Basa and Homemade Hot Honey Chilli Oil,2,2351,525
+2026-W23,63,HelloFresh,Thai Style Pork Belly Noodles,2,2432,451.3
+2026-W23,64,HelloFresh,Loaded Chipotle Pulled Chicken Rice Bowl,2,3610,404.8
+2026-W23,65,HelloFresh,Peri Peri Chicken Burger and Wedges,2,4378,656.3
+2026-W23,66,HelloFresh,Herby Creamy Tomato Chicken Penne,2,2920,495.4
+2026-W23,67,HelloFresh,Sticky Honey Indonesian Style Beef Rice Bowl,2,2555,409.3
+2026-W23,68,HelloFresh,Tex-Mex Style Pork Mince Tacos,2,3944,542.8
+2026-W23,69,HelloFresh,Chermoula Lamb Koftas and Balsamic Fig Sauce,2,2356,526.3
+2026-W23,70,HelloFresh,Speedy Chipotle Bean Chilli,2,3138,667.5
+2026-W23,71,HelloFresh,Presto Pesto Pea Rigatoni,2,3207,418.5
+2026-W23,72,HelloFresh,21 Day Aged Sirloin Steak in Garlic & Chive Butter,2,3544,548.5
+2026-W23,73,HelloFresh,Herby Crumbed Haddock and Salt & Vinegar Chips,2,2458,573
+2026-W23,74,HelloFresh,Monkfish and Prawns in Cheesy Mornay Style Sauce,2,3959,804.5
+2026-W23,75,HelloFresh,Pulled Beef Ragu Lasagne,2,5904,818.5
+2026-W23,76,HelloFresh,Greek Inspired 21 Day Aged Rump Steak Salad,2,3239,811.3
+2026-W23,77,HelloFresh,Smoky BBQ Pulled Pork Bao,2,5239,725.3
+2026-W23,78,HelloFresh,Ultimate Triple Cheese Chorizo Mac and Cheese,2,6221,536.8
+2026-W23,79,HelloFresh,Sun-Dried Tomato Salmon,2,3726,592.5
+2026-W23,80,HelloFresh,Quick Tandoori Spiced Paneer Rice Bowl,2,4027,585.3
+2026-W24,1,HelloFresh,Chinese Style Chicken and Veg Noodle Stir-Fry,2,2137,372.5
+2026-W24,2,HelloFresh,Beef and Pork Rogan Josh Style Curry,2,3113,659.8
+2026-W24,3,HelloFresh,Spiced BBQ Pork Quesadillas Rapidas,2,3953,448.8
+2026-W24,4,HelloFresh,Italian Inspired Chicken Milanese,2,4585,652.5
+2026-W24,5,HelloFresh,Classic Sausage Burger,2,3743,531.5
+2026-W24,6,HelloFresh,Homemade Cheesy Bean Jacket Potato,2,3360,815.3
+2026-W24,7,HelloFresh,Build Your Own: Sticky Chicken Fajitas and Wedges,2,3416,654.7
+2026-W24,8,HelloFresh,Garlic and Ginger Pork Meatballs,2,3145,418.3
+2026-W24,9,HelloFresh,Sicilian Style Bacon and Pistachio Pasta alla Brontese,2,3205,391
+2026-W24,10,HelloFresh,Butterflied Chicken and Romesco Yoghurt Sauce,2,2300,578.4
+2026-W24,11,HelloFresh,Baked Sausage Gigantes Plaki,2,2837,654
+2026-W24,12,HelloFresh,Sun-Dried Tomato Spiced Beef Koftas,2,2633,514.9
+2026-W24,13,HelloFresh,Santorini Style Tomatokeftedes,2,2240,736.5
+2026-W24,14,HelloFresh,Erbazzone Reggiano Inspired Spinach Cheese Pies,2,4690,780.2
+2026-W24,15,HelloFresh,"Chorizo, Goat's Cheese and Kumato Tomato Tartines",2,3472,542.3
+2026-W24,16,HelloFresh,"Sausage, Caramelised Fennel and Pecorino Pasta",2,4036,487.7
+2026-W24,17,HelloFresh,Pork Keftedes Inspired Loaded Flatbread,2,3460,478.5
+2026-W24,18,HelloFresh,Quick Peri Peri Chorizo and Corn Tacos,2,3986,628.8
+2026-W24,19,HelloFresh,Slow Roasted Kumato Tomato Herby Rice Bowl,2,3374,581
+2026-W24,20,HelloFresh,Mediterranean Style Roasted Fennel & Chilli Yoghurt,2,2592,790
+2026-W24,21,HelloFresh,Warming Spiced Salmon Harvest Bowl,2,3153,612.5
+2026-W24,22,HelloFresh,Oven-Baked Haddock and Herby Relish,2,2519,606.4
+2026-W24,23,HelloFresh,Chettinad Style King Prawn and Sweet Potato Curry,2,2648,674.5
+2026-W24,24,HelloFresh,Cajun Style Prawn and Corn Chowder,2,1822,635.8
+2026-W24,25,HelloFresh,"Tuna, Avocado and Edamame Bento Style Bowl",2,3085,394.8
+2026-W24,26,HelloFresh,Mexican Style Cheesy Pork Empanadas,2,5725,760.3
+2026-W24,27,HelloFresh,Super Quick Smoky Chicken and Rice,2,2824,441.8
+2026-W24,28,HelloFresh,Super Quick Honey-Miso Chicken,2,2277,440
+2026-W24,29,HelloFresh,Easy Peasy Thai Inspired Pork Noodle Stir-Fry,2,2939,366.7
+2026-W24,30,HelloFresh,Easy Peasy Chorizo Linguine,2,3309,335.8
+2026-W24,31,HelloFresh,Herby Sausage Spaghetti Bolognese,2,3807,573.5
+2026-W24,32,HelloFresh,Fuss-Free Hoisin Chicken Thigh Traybake,2,3268,571
+2026-W24,33,HelloFresh,Indonesian Style Chicken Satay Traybake,2,2540,562.5
+2026-W24,34,HelloFresh,Chilli-Garlic Butter Rump Steak and Chips,2,2521,580.3
+2026-W24,35,HelloFresh,Brilliant Bacon Linguine Alfredo,2,3435,353.9
+2026-W24,36,HelloFresh,Spiced Chicken and Smoky Bravas Bean Bowl,2,3803,666.7
+2026-W24,37,HelloFresh,Quick BBQ Chicken Thighs and Aioli Potato Salad,2,3429,565
+2026-W24,38,HelloFresh,Weeknight Chicken Fried Rice,2,2467,400.3
+2026-W24,39,HelloFresh,Super Quick Beef Cheeseburger Inspired Rice Bowl,2,3195,400.8
+2026-W24,40,HelloFresh,Pork Steaks and Caramelised Onion Guinness® Gravy,2,1838,621.9
+2026-W24,41,HelloFresh,Speedy Bloody Mary Inspired Chicken Rigatoni,2,3096,507.9
+2026-W24,42,HelloFresh,Super Cheesy Oven-Baked Tomato Risotto,2,2703,622.9
+2026-W24,43,HelloFresh,Malaysian Style Veggie Laksa,2,3020,583.2
+2026-W24,44,HelloFresh,Chipotle Corn and Black Bean Soup,2,3837,774.4
+2026-W24,45,HelloFresh,Creamy Chickpea and Pepper Rice Bowl,2,3461,561.4
+2026-W24,46,HelloFresh,Simple Stovetop Veggie 'Nduja Mac & Cheese,2,3727,360.9
+2026-W24,47,HelloFresh,"Warming Ginger, Peanut and Coconut Curry",2,3764,792.5
+2026-W24,48,HelloFresh,Golden Halloumi and Pitta Chips Salad,2,3041,405.8
+2026-W24,49,HelloFresh,Cheesy Sweet Chilli Veggie Burger,2,3718,532.5
+2026-W24,50,HelloFresh,Malaysian Style Coconut Tofu Curry,2,3483,650.5
+2026-W24,51,HelloFresh,North Indian Style Saag Paneer,2,3340,588.8
+2026-W24,52,HelloFresh,Mozzarella and Roasted Butternut Squash Salad,2,2601,529.9
+2026-W24,53,HelloFresh,Cheesy Veggie Lentil Ragu Stuffed Pepper,2,2392,680.3
+2026-W24,54,HelloFresh,Spicy Pasanda Chicken Curry,2,2609,442
+2026-W24,55,HelloFresh,Easy Peasy Bulgogi Chicken Noodles,2,2389,423
+2026-W24,56,HelloFresh,Sour Cherry Chicken on Jewelled Pearl Couscous,2,2669,590.2
+2026-W24,57,HelloFresh,Rosemary Chicken Breast and Cacio e Pepe Chickpeas,2,3035,692.9
+2026-W24,58,HelloFresh,Korma Spiced Chicken and Pepper Skewers,2,2585,551.5
+2026-W24,59,HelloFresh,Cured Ham Tortelloni in Veggie 'Nduja Sauce,2,2227,427
+2026-W24,60,HelloFresh,Speedy Brazilian Style Beef and Black Bean Soup,2,2549,612.8
+2026-W24,61,HelloFresh,Teriyaki Chicken Udon Traybake,2,1861,505.7
+2026-W24,62,HelloFresh,Malaysian Style Gulai Tumis Fish Curry,2,2524,682.8
+2026-W24,63,HelloFresh,Harissa Lamb Steaks and Pearl Couscous Salad,2,3404,502.5
+2026-W24,64,HelloFresh,Smoky Maple Ribs & Cheesy Corn Sweet Potato Wedges,2,4375,685.8
+2026-W24,65,HelloFresh,Peri Peri Chicken Burger and Wedges,2,4420,656.3
+2026-W24,66,HelloFresh,Herby Creamy Tomato Chicken Penne,2,2920,495.4
+2026-W24,67,HelloFresh,Sticky Honey Indonesian Style Beef Rice Bowl,2,2555,409.3
+2026-W24,68,HelloFresh,Tex-Mex Style Pork Mince Tacos,2,3944,542.8
+2026-W24,69,HelloFresh,Chermoula Lamb Koftas and Balsamic Fig Sauce,2,2362,526.5
+2026-W24,70,HelloFresh,Speedy Chipotle Bean Chilli,2,3138,667.5
+2026-W24,71,HelloFresh,Presto Pesto Pea Rigatoni,2,3207,418.5
+2026-W24,72,HelloFresh,21 Day Aged Sirloin Steak and Peppercorn Sauce,2,3864,699.8
+2026-W24,73,HelloFresh,Lemon & Herb Salmon and Garlic Butter King Prawns,2,3264,631.3
+2026-W24,74,HelloFresh,Monkfish and Kumato Tomato & Black Garlic Sauce,2,3034,765.5
+2026-W24,75,HelloFresh,21 Day Aged Fillet Steak and Tarragon Salsa Verde,2,3488,547
+2026-W24,76,HelloFresh,Honey and Soy Glazed Duck Breast,2,2562,584.5
+2026-W24,77,HelloFresh,Ultimate Mediterranean Style Prawn & Chorizo Gnocchi,2,3846,859.5
+2026-W24,78,HelloFresh,Ultimate Cumberland Sausage Toad in the Hole,2,4238,865.8
+2026-W24,79,HelloFresh,"Brunch Inspired Fried Chicken, Bacon and Waffles",2,3365,495.8
+2026-W24,80,HelloFresh,Shawarma Style Harissa Fable Mushroom Flatbreads,2,5834,766.8
+2026-W25,1,HelloFresh,Crispy Chicken Schnitzel and Wedges,2,2384,538.7
+2026-W25,2,HelloFresh,BBQ Beef and Pork Quesadillas Rapidas,2,3239,464.8
+2026-W25,3,HelloFresh,Quick Fragrant Pork and Mushroom Stir-Fry,2,2786,356
+2026-W25,4,HelloFresh,Teriyaki Chicken Tacos and Chips,2,3195,615.9
+2026-W25,5,HelloFresh,Bacon and Butternut Squash Stovetop Risotto,2,2781,572.3
+2026-W25,6,HelloFresh,Red Thai Style Sweet Potato Curry and Zesty Rice,2,3226,772
+2026-W25,7,HelloFresh,Build Your Own: Spiced Pork and Corn Tacos,2,3491,557.3
+2026-W25,8,HelloFresh,Family Favourite Cheesy Beef Chilli Loaded Jacky-P,2,3209,740
+2026-W25,9,HelloFresh,Cheesy Piggy Pie and Peas,2,3456,833.5
+2026-W25,10,HelloFresh,Portuguese Bifana Inspired Pork Sando,2,3376,716.7
+2026-W25,11,HelloFresh,Chicken alla Cacciatora and Roast Potatoes,2,2009,726.9
+2026-W25,12,HelloFresh,Summery Crispy Serrano Ham and Lemon Risotto,2,2195,738.5
+2026-W25,13,HelloFresh,Beef Albóndigas and Butter Bean Stew,2,2786,678.7
+2026-W25,14,HelloFresh,Spanakopita Inspired Sigara Böreği,2,4356,573.3
+2026-W25,15,HelloFresh,Tuscan Ribollita Inspired Soup,2,3341,692
+2026-W25,16,HelloFresh,Butterflied Chicken and Kumato Tomato Salad,2,2588,581
+2026-W25,17,HelloFresh,Sticky Pork & Apple Burgers and Fennel Slaw,2,4101,661.4
+2026-W25,18,HelloFresh,Crispy Chicken and Hot Sauce Burger,2,4102,704
+2026-W25,19,HelloFresh,Cumberland Sausage and Pesto Roasted Veg Traybake,2,3207,674.5
+2026-W25,20,HelloFresh,Kumato Tomato and Goat's Cheese Tart,2,4849,472.5
+2026-W25,21,HelloFresh,"Fennel, Harissa and Chickpea Tagine",2,2941,886
+2026-W25,22,HelloFresh,21 Day Aged Rump Steak and Lime Chive Butter,2,2538,498
+2026-W25,23,HelloFresh,Teriyaki Duck Rice Bowl,2,3459,673
+2026-W25,24,HelloFresh,Bavarian Style Pork Belly and Homemade Apple Sauce,2,2463,828.4
+2026-W25,25,HelloFresh,Teriyaki Salmon Poke Style Bowl,2,2613,503
+2026-W25,26,HelloFresh,Pesto Baked Haddock and Warm Tomato Salsa,2,2254,454.9
+2026-W25,27,HelloFresh,Tuscan Style Tuna Pasta Bake,2,2926,431.8
+2026-W25,28,HelloFresh,Jerk Spiced Crispy Prawn Tacos,2,3690,587.9
+2026-W25,29,HelloFresh,Super Quick Sausage Lasagne Soup,2,2600,559.2
+2026-W25,30,HelloFresh,Speediest Szechuan Chicken Stir-Fry,2,2171,363.1
+2026-W25,31,HelloFresh,Super Quick Cheeseburger Inspired Rice Bowl,2,3558,398.8
+2026-W25,32,HelloFresh,Cured Ham Pasta Arrabbiata,2,2522,388.8
+2026-W25,33,HelloFresh,Red Pepper Chilli Jelly Glazed Sausage Bake,2,3198,524.5
+2026-W25,34,HelloFresh,Easy Spanish Style Chicken Traybake,2,3152,615.4
+2026-W25,35,HelloFresh,Quick Harissa Cranberry Chicken on Bulgur,2,2349,542.5
+2026-W25,36,HelloFresh,Speedy Thai Inspired Pork Noodles,2,3014,405.7
+2026-W25,37,HelloFresh,Creamy Bacon and Mustard Penne,2,3535,382
+2026-W25,38,HelloFresh,Quick and Easy Teriyaki Pork,2,3126,410
+2026-W25,39,HelloFresh,Harissa Chicken Loaded Naans,2,2652,403.8
+2026-W25,40,HelloFresh,Speedy Chorizo and Pea Orzo,2,3265,339.3
+2026-W25,41,HelloFresh,15 Minute Creamy Truffle Mushroom Spaghetti,2,3158,364.5
+2026-W25,42,HelloFresh,Speedy Veggie Beany Stew,2,2784,559
+2026-W25,43,HelloFresh,"Warming Ginger, Cauliflower and Coconut Bowl",2,2581,554.5
+2026-W25,44,HelloFresh,Umami Miso Mushroom Rigatoni,2,3151,370
+2026-W25,45,HelloFresh,Harissa Pearl Couscous Salad and Honeyed Carrots,2,3283,694.8
+2026-W25,46,HelloFresh,Jerk Spiced Halloumi and Couscous Bowl,2,3713,538
+2026-W25,47,HelloFresh,Cheesy Garlic Mushroom Pizza & TABASCO® Brand Pepper Sauce Drizzle,2,4118,518.3
+2026-W25,48,HelloFresh,Black Garlic and Hoisin Glazed Tofu Bowl,2,2648,543.7
+2026-W25,49,HelloFresh,"Goat's Cheese, Apricot Jam and Crispy Onion Panini",2,2705,526.8
+2026-W25,50,HelloFresh,Aubergine Parmigiana Style Traybake,2,2163,594.9
+2026-W25,51,HelloFresh,North Indian Style Roasted Cauliflower & Lentil Dal,2,1796,553.5
+2026-W25,52,HelloFresh,Cantonese Style Chicken Stir-Fry,2,2057,417.5
+2026-W25,53,HelloFresh,Chicken and Pepper Fajita Bowl,2,2399,492
+2026-W25,54,HelloFresh,Greek Style Lamb Moussaka,2,2411,507.3
+2026-W25,55,HelloFresh,"Creamy Honey Bacon, Potato and Baby Gem Salad",2,2443,479.5
+2026-W25,56,HelloFresh,Lemon & Herb Basa and Garlic-Parsley Drizzle,2,2238,564.5
+2026-W25,57,HelloFresh,Pan-Fried Garlic Butter Chicken Thighs,2,3349,604.9
+2026-W25,58,HelloFresh,Cheesy Beef Mince Ragu,2,2984,453.9
+2026-W25,59,HelloFresh,Chermoula Chicken and Warm Panzanella Pasta Salad,2,2685,419.5
+2026-W25,60,HelloFresh,Pork Meatballs in Smoky Tomato Sauce,2,2683,630.8
+2026-W25,61,HelloFresh,Herby Roast Chicken on Butter Beans,2,2912,579.8
+2026-W25,62,HelloFresh,"King Prawn, Chilli and Chorizo Fresh Tagliatelle",2,3131,687.3
+2026-W25,63,HelloFresh,Hot Honey Glazed Lamb Steak and Truffle Potatoes,2,2747,614.5
+2026-W25,64,HelloFresh,Chimichurri 21 Day Aged Rump Steak Surf and Turf,2,3391,661.8
+2026-W25,65,HelloFresh,Hoisin Pulled Beef Bao and Black Sesame Wedges,2,2779,616.5
+2026-W25,66,HelloFresh,Ultimate Cheesy Beef & Bacon Bolognese Gnocchi Bake,2,4154,648.5
+2026-W25,67,HelloFresh,Creamy Pesto Salmon and Bacon Smashed Potatoes,2,4592,727.4
+2026-W25,68,HelloFresh,Chicken and Halloumi Shawarma,2,5097,744.3
+2026-W25,69,HelloFresh,Korean Style Braised Pork Belly and Sticky Rice,2,3397,519.3
+2026-W25,70,HelloFresh,Crispy Buffalo Halloumi Burger,2,4811,708.8
+2026-W25,71,HelloFresh,Korma Baked Basa and Chips,2,2641,578.5
+2026-W25,72,HelloFresh,Curried Chicken Thigh Traybake,2,3684,721.5
+2026-W25,73,HelloFresh,Loaded Beef Chilli Nachos,2,4042,542
+2026-W25,74,HelloFresh,Crispy Serrano Caprese Bruschetta,2,2021,416
+2026-W25,75,HelloFresh,Marry Me Chicken,2,2536,626
+2026-W25,76,HelloFresh,Chicken in Creamy Tarragon Sauce,2,2294,601.3
+2026-W25,77,HelloFresh,"Banging Bacon, Mustard and Mushroom Pie",2,2613,718
+2026-W25,78,HelloFresh,Cheeseburger Inspired Beef Quesadillas Rapidas,2,4021,493
+2026-W25,79,HelloFresh,Buffalo Style Chicken Salad,2,2825,483.8
+2026-W25,80,HelloFresh,Cumberland Sausages in Mustard Cream Sauce,2,3208,766.9
+2026-W26,1,HelloFresh,"Jerk, Coconut and Guinness® Chicken Breast",2,3373,782
+2026-W26,2,HelloFresh,Herby Beef and Pork Meatball Linguine,2,3759,567.2
+2026-W26,3,HelloFresh,Honey Mustard Sausages and Red Onion Gravy,2,2669,602.5
+2026-W26,4,HelloFresh,"Winner, Winner, Chicken (Pie) Dinner",2,4158,782.5
+2026-W26,5,HelloFresh,Honey Mustard Sausage Traybake,2,3093,727.5
+2026-W26,6,HelloFresh,Roasted Vegetable Lasagne,2,3031,607.3
+2026-W26,7,HelloFresh,Build Your Own: Cheesy Baked Potato Bar,2,3352,589.5
+2026-W26,8,HelloFresh,Family Favourite Sweet Chilli Pork & Veg Stir-Fry,2,2729,571.8
+2026-W26,9,HelloFresh,Creamy Curried Chicken Pie and Peas,2,3069,669.5
+2026-W26,10,HelloFresh,Sicilian Style Bacon & Pistachio Pasta alla Brontese,2,3205,391
+2026-W26,11,HelloFresh,Butterflied Chicken and Romesco Yoghurt Sauce,2,2300,578.4
+2026-W26,12,HelloFresh,Baked Sausage Gigantes Plaki,2,2831,653.8
+2026-W26,13,HelloFresh,Sun-Dried Tomato Spiced Beef Koftas,2,2633,514.9
+2026-W26,14,HelloFresh,Santorini Style Tomatokeftedes,2,2240,736.5
+2026-W26,15,HelloFresh,Erbazzone Reggiano Inspired Spinach Cheese Pies,2,4690,780.2
+2026-W26,16,HelloFresh,"Chorizo, Goat's Cheese and Kumato Tomato Tartines",2,3467,542
+2026-W26,17,HelloFresh,"Sausage, Caramelised Fennel and Pecorino Pasta",2,4036,487.7
+2026-W26,18,HelloFresh,Red Pepper Chilli Glazed Beef Kofta Tacos,2,3299,560.6
+2026-W26,19,HelloFresh,'Nduja & Red Pepper Ravioli in Spicy Pomodoro Sauce,2,3125,473.9
+2026-W26,20,HelloFresh,Slow Roasted Kumato Tomato Herby Rice Bowl,2,3374,581
+2026-W26,21,HelloFresh,Mediterranean Style Roasted Fennel & Chilli Yoghurt,2,2592,790
+2026-W26,22,HelloFresh,Korean Style Rump Steak Bibimbap,2,2996,598
+2026-W26,23,HelloFresh,Chipotle Ribs and Loaded Cheese Smashed Potatoes,2,3908,720
+2026-W26,24,HelloFresh,Cheesy Pulled Chicken Burger Bowls,2,3657,555.5
+2026-W26,25,HelloFresh,Caribbean Style Spiced Salmon,2,2642,499.8
+2026-W26,26,HelloFresh,Crispy Haddock and Sesame Chips,2,2533,553.5
+2026-W26,27,HelloFresh,Mediterranean Style Mussel Baked Rice,2,2666,879.3
+2026-W26,28,HelloFresh,Chimichurri Prawn & Pepper Skewers and Chips,2,1913,605
+2026-W26,29,HelloFresh,Super Quick Chorizo and Chickpea Stew,2,2845,585.9
+2026-W26,30,HelloFresh,Speedy Cantonese Style Chicken Stir-Fry,2,2165,380
+2026-W26,31,HelloFresh,Super Quick Tex-Mex Style Pork Tacos,2,3544,436.5
+2026-W26,32,HelloFresh,Super Quick Bulgogi Pork Noodles,2,2849,380.7
+2026-W26,33,HelloFresh,Hoisin Glazed Cumberland Sausages,2,2538,564
+2026-W26,34,HelloFresh,Put Your Feet Up Kashmiri Style Chicken Traybake,2,3338,574.3
+2026-W26,35,HelloFresh,Fast Fragrant Vietnamese Style Chicken Salad,2,2827,442.5
+2026-W26,36,HelloFresh,Banging Bangers and Garlic Mash,2,2317,694
+2026-W26,37,HelloFresh,Easy Pork Cheeseburger Inspired Bowl,2,3724,479.3
+2026-W26,38,HelloFresh,Korean Style BBQ Pork and Mushroom Stir-Fry,2,2713,515.5
+2026-W26,39,HelloFresh,Indonesian Style Peanut Chicken Salad,2,2838,519.6
+2026-W26,40,HelloFresh,Italian Style Sausage and Ditali Pasta Soup,2,2420,634.9
+2026-W26,41,HelloFresh,Puttanesca Style Rigatoni,2,2506,409.2
+2026-W26,42,HelloFresh,Pesto Orzo and Roasted Chickpea Salad,2,3848,461.5
+2026-W26,43,HelloFresh,Warming Veggie 'Nduja Sweet Potato Rice Bowl,2,3292,492.5
+2026-W26,44,HelloFresh,"Mozzarella, Roasted Pepper and Pesto Panini",2,2796,476.7
+2026-W26,45,HelloFresh,One Pan Thai Green Style Veggie Noodle Soup,2,2565,575.2
+2026-W26,46,HelloFresh,Glazed Halloumi and Veg Loaded Harissa Bulgur Bowl,2,3757,534.5
+2026-W26,47,HelloFresh,"Ready to Roll Mozzarella, Courgette & Tomato Pizza",2,4821,812.4
+2026-W26,48,HelloFresh,Caramelised Tofu and Aubergine Stir-Fry,2,2730,668.8
+2026-W26,49,HelloFresh,"Creamy Mushroom, Spinach & Ricotta Tortelloni",2,2680,431.4
+2026-W26,50,HelloFresh,Italian Inspired Butter Bean Cassoulet,2,2472,578.9
+2026-W26,51,HelloFresh,Charred Courgette & Creamy Tomato Butter Beans,2,2307,619.5
+2026-W26,52,HelloFresh,Sour Cherry Chicken on Jewelled Pearl Couscous,2,2619,590.2
+2026-W26,53,HelloFresh,Hot Honey Spiced Chicken Thighs,2,2666,552.6
+2026-W26,54,HelloFresh,Fragrant Lamb Noodle Stir-Fry,2,2314,477.8
+2026-W26,55,HelloFresh,"Stovetop Bacon, White Wine and Mushroom Risotto",2,2600,726.9
+2026-W26,56,HelloFresh,Spiced Barramundi and Parsley Gremolata,2,1811,458.8
+2026-W26,57,HelloFresh,Spiced Almond Crumbed Chicken,2,3194,592.5
+2026-W26,58,HelloFresh,Quick Sweet and Sticky Beef,2,2608,390.7
+2026-W26,59,HelloFresh,Red Wine Lamb Ragu and Linguine,2,2945,546.9
+2026-W26,60,HelloFresh,Chipotle Chicken Fajita Traybake,2,2081,521.3
+2026-W26,61,HelloFresh,Caribbean Inspired Pineapple Jerk Chicken Thighs,2,3746,740
+2026-W26,62,HelloFresh,"Monkfish, Bacon and Pea Oven-Baked Risotto",2,3332,733.5
+2026-W26,63,HelloFresh,Lamb Steak and Truffled Parmigiano Reggiano Sauce,2,2623,614
+2026-W26,64,HelloFresh,21 Day Aged Fillet Steak and Peppercorn Sauce,2,2258,569.4
+2026-W26,65,HelloFresh,Bulgogi Pulled Beef Burger and Black Sesame Chips,2,3906,762
+2026-W26,66,HelloFresh,"Creamy Pesto Chicken, Bacon and Pea Tagliatelle",2,4664,681
+2026-W26,67,HelloFresh,Teriyaki Pork Belly and Sushi Rice Donburi,2,4136,633.5
+2026-W26,68,HelloFresh,Crispy Buffalo Chicken Tacos and Cheesy Chips,2,5772,861
+2026-W26,69,HelloFresh,King Prawn Topped Sea Bream and Mango Salsa,2,2288,705
+2026-W26,70,HelloFresh,Cheesy Chipotle Black Bean Enchiladas,2,4664,833
+2026-W26,71,HelloFresh,Korma Baked Basa and Chips,2,2641,578.5
+2026-W26,72,HelloFresh,Curried Chicken Thigh Traybake,2,3684,721.5
+2026-W26,73,HelloFresh,Loaded Beef Chilli Nachos,2,3955,537
+2026-W26,74,HelloFresh,Crispy Serrano Caprese Bruschetta,2,2021,416
+2026-W26,75,HelloFresh,Marry Me Chicken,2,2536,626
+2026-W26,76,HelloFresh,Chicken in Creamy Tarragon Sauce,2,2294,601.3
+2026-W26,77,HelloFresh,"Banging Bacon, Mustard and Mushroom Pie",2,2613,718
+2026-W26,78,HelloFresh,Cheeseburger Inspired Beef Quesadillas Rapidas,2,3934,488
+2026-W26,79,HelloFresh,Buffalo Style Chicken Salad,2,2825,483.8
+2026-W26,80,HelloFresh,Cumberland Sausages in Mustard Cream Sauce,2,3208,766.9
+2026-W27,1,HelloFresh,Indonesian Style Spiced Chicken Noodles,2,2214,423.8
+2026-W27,2,HelloFresh,Family Favourite Beef & Pork Cheddar Cheeseburger,2,3931,625.7
+2026-W27,3,HelloFresh,Pronto Bacon and Mushroom Linguine,2,2961,432.9
+2026-W27,4,HelloFresh,North Indian Style Chicken Stuffed Cheesy Naan,2,4292,613.8
+2026-W27,5,HelloFresh,Oven-Baked Chorizo and Sweetcorn Risotto,2,3323,626
+2026-W27,6,HelloFresh,Mixed Bean Loaded Fries,2,3130,873.5
+2026-W27,7,HelloFresh,Build Your Own: Sausage Meatball Marinara Subs,2,3809,570.7
+2026-W27,8,HelloFresh,Mediterranean Style Chicken and Creamy Pesto Orzo,2,3860,580
+2026-W27,9,HelloFresh,"Sausage & Apple Meatballs, Mash and Gravy",2,3064,704
+2026-W27,10,HelloFresh,Naked Spiced Lamb Kofta Kebab Salad,2,2633,485
+2026-W27,11,HelloFresh,Persian Style Spiced Chicken Stew,2,2262,935.7
+2026-W27,12,HelloFresh,Glazed Beef Koftas and Muhammara Inspired Sauce,2,3540,744.3
+2026-W27,13,HelloFresh,Chermoula Chicken Loaded Naan,2,4076,461.8
+2026-W27,14,HelloFresh,Sticky Harissa Carrot and Crispy Chickpea Salad,2,4458,783.5
+2026-W27,15,HelloFresh,Triple Cheese & Spinach Gözleme Inspired Quesadillas,2,3609,582.4
+2026-W27,16,HelloFresh,Spiced Chicken and Yellow Courgette Loaded Naans,2,3858,654.5
+2026-W27,17,HelloFresh,Campfire Style Sausage Meatball Chilli and Rice,2,4244,963.5
+2026-W27,18,HelloFresh,Crispy Pork Schnitzel and Hoisin Plum Sauce,2,2903,581.3
+2026-W27,19,HelloFresh,"Honey Dijon Bacon, Potato and Apple Salad",2,2859,501.5
+2026-W27,20,HelloFresh,"Miso, Green Chilli and Yellow Courgette Rigatoni",2,3382,711.3
+2026-W27,21,HelloFresh,Campfire Style BBQ Bean Quesadillas,2,3712,566.5
+2026-W27,22,HelloFresh,Glazed Rump Steak and Soy Butter Potatoes,2,2438,473.2
+2026-W27,23,HelloFresh,Sriracha Pork Belly and Easy Sesame Fried Rice,2,3257,507
+2026-W27,24,HelloFresh,Pan-Seared Lamb Steak and Salsa Verde,2,2475,733.4
+2026-W27,25,HelloFresh,Hot Honey Baked Salmon,2,3288,499.5
+2026-W27,26,HelloFresh,Baked Spiced Barramundi and Herby Olive Couscous,2,2207,409.5
+2026-W27,27,HelloFresh,Gambas Pil Pil Inspired Prawns,2,1992,587.2
+2026-W27,28,HelloFresh,Simple Lemon and Prawn Linguine,2,2431,493
+2026-W27,29,HelloFresh,Easy Peasy Pork and Mushroom Stir-Fry,2,2804,361.3
+2026-W27,30,HelloFresh,Super Quick Lemongrass Chicken Noodles,2,2123,417.5
+2026-W27,31,HelloFresh,15 Minute Cheesy Bacon Orzo,2,3068,351.3
+2026-W27,32,HelloFresh,Speedy Sausages and Smoky Cowboy Beans,2,2387,580.8
+2026-W27,33,HelloFresh,Cosy Sausage Traybake and Cheesy Wedges,2,2767,701.9
+2026-W27,34,HelloFresh,Fuss-Free Tandoori Inspired Chicken Traybake,2,3247,691
+2026-W27,35,HelloFresh,Roasted Chicken Thighs and Cheesy Leek Sauce,2,3254,627.9
+2026-W27,36,HelloFresh,Smoky Mexican Style Pork Burrito Bowl,2,3502,514.8
+2026-W27,37,HelloFresh,Weeknight Fragrant Hoisin Pork Noodles,2,3310,480
+2026-W27,38,HelloFresh,Korean Style BBQ Pork Mince,2,3129,571
+2026-W27,39,HelloFresh,Creamy Cajun Chicken Penne,2,2882,463.8
+2026-W27,40,HelloFresh,Peri Peri Chicken Fajita Style Tacos,2,3203,490.3
+2026-W27,41,HelloFresh,Quick Thai Green Style Veggie Curry,2,2352,458.2
+2026-W27,42,HelloFresh,Rapid Roasted Pepper and Aubergine Linguine,2,2664,555
+2026-W27,43,HelloFresh,Quick Sticky Tandoori Spiced Cauliflower Salad,2,2111,585.8
+2026-W27,44,HelloFresh,Vibrant Veggie Burrito Bowl,2,2542,673.3
+2026-W27,45,HelloFresh,Chipotle Lentil and Mushroom Enchiladas,2,3139,502
+2026-W27,46,HelloFresh,Pan-Fried Halloumi and Pesto Drizzle,2,2961,599
+2026-W27,47,HelloFresh,Sticky Spiced Mango Glazed Paneer Tacos,2,4675,622.4
+2026-W27,48,HelloFresh,Sweet Sambal-Hoisin Tofu and Coriander Rice,2,2578,572.5
+2026-W27,49,HelloFresh,Pesto Dressed Caprese Style Salad,2,2606,464
+2026-W27,50,HelloFresh,Rich and Creamy Veggie 'Nduja Tortelloni,2,2663,432.5
+2026-W27,51,HelloFresh,Middle Eastern Style Roasted Veg Salad,2,2601,711
+2026-W27,52,HelloFresh,Quick Greek Style Oregano Chicken Pasta Salad,2,2303,433.5
+2026-W27,53,HelloFresh,Creamy Honey and Mustard Chicken,2,2355,550
+2026-W27,54,HelloFresh,Greek Style Oregano Lamb and Couscous Bowl,2,2494,492.8
+2026-W27,55,HelloFresh,Cured Ham Tortelloni in Creamy Mushroom Sauce,2,2481,336
+2026-W27,56,HelloFresh,Basa in Creamy Cajun Sauce,2,2154,474
+2026-W27,57,HelloFresh,Red Thai Style Marinated Chicken Skewers and Chips,2,2214,576.7
+2026-W27,58,HelloFresh,Lebanese Style Baked Beef Meatballs in Tomato Sauce,2,2470,581
+2026-W27,59,HelloFresh,Easy Peasy Gochujang Pork Noodles,2,2809,327.5
+2026-W27,60,HelloFresh,Chermoula Baked Chicken Thighs,2,3057,571.3
+2026-W27,61,HelloFresh,"Beef, Chickpea and Spinach Rogan Josh",2,4208,866.3
+2026-W27,62,HelloFresh,Roasted Salmon and Thai Green Style Curry,2,4114,675.6
+2026-W27,63,HelloFresh,21 Day Aged Sirloin Steak and Cheesy Rosemary Chips,2,2923,530.5
+2026-W27,64,HelloFresh,"Monkfish, Bacon and Butternut Oven-Baked Risotto",2,3424,869.8
+2026-W27,65,HelloFresh,Easy Pulled Beef Ragu and Fresh Tagliatelle,2,4537,684
+2026-W27,66,HelloFresh,Satay Chicken and King Prawn Loaded Tortillas,2,5686,963.5
+2026-W27,67,HelloFresh,Chipotle Ribs and Cheesy Chorizo Smashed Potatoes,2,5050,815
+2026-W27,68,HelloFresh,Greek Inspired 21 Day Aged Rump Steak Salad,2,3232,773.8
+2026-W27,69,HelloFresh,Fried Peri Peri Chicken & Crispy Bacon Burger,2,5335,844.5
+2026-W27,70,HelloFresh,Ultimate Truffle Mushroom Mac and Cheese,2,5665,552
+2026-W27,71,HelloFresh,Korma Baked Basa and Chips,2,2641,578.5
+2026-W27,72,HelloFresh,Curried Chicken Thigh Traybake,2,3684,721.5
+2026-W27,73,HelloFresh,Loaded Beef Chilli Nachos,2,3955,537
+2026-W27,74,HelloFresh,Crispy Serrano Caprese Bruschetta,2,2021,416
+2026-W27,75,HelloFresh,Marry Me Chicken,2,2536,626
+2026-W27,76,HelloFresh,Chicken in Creamy Tarragon Sauce,2,2294,601.3
+2026-W27,77,HelloFresh,"Banging Bacon, Mustard and Mushroom Pie",2,2613,718
+2026-W27,78,HelloFresh,Cheeseburger Inspired Beef Quesadillas Rapidas,2,3934,488
+2026-W27,79,HelloFresh,Buffalo Style Chicken Salad,2,2825,483.8
+2026-W27,80,HelloFresh,Cumberland Sausages in Mustard Cream Sauce,2,3208,766.9
