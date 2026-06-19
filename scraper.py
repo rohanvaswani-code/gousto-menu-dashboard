@@ -23,7 +23,12 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 # -------------------- CONFIG --------------------
 NUM_PORTIONS = 4
-WEEKS_TO_FETCH = [0, 1, 2]
+# Gousto's menu API exposes the current week + 6-7 forward weeks. We fetch
+# everything available so the dashboard's Gousto-only tabs (recipes,
+# ingredients) reach as far as possible — useful even before HF/prices are
+# uploaded for a given week. Weeks the API doesn't have are gracefully
+# skipped (the API returns an empty menu).
+WEEKS_TO_FETCH = [0, 1, 2, 3, 4, 5, 6, 7]
 SCRIPT_DIR = Path(__file__).resolve().parent
 OUTPUT_DIR = SCRIPT_DIR / "data"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
