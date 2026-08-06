@@ -569,6 +569,7 @@ with tab_trends:
             )
 
         for metric_name, axis_title in (
+            ("Per serving", "Price per serving (£) — incl. shipping"),
             ("Per 100 cal", "Price per 100 kcal (£)"),
             ("Per 100g", "Price per 100g (£)"),
         ):
