@@ -129,9 +129,13 @@ def load_hellofresh(fingerprint=None):
 
 @st.cache_data(ttl=600)
 def load_prices(fingerprint=None):
-    """Return long-form: rows of (week, brand, box_price)."""
+    """Return long-form: rows of (week, brand, box_config, box_price).
+    Supports both formats:
+      - Legacy: single row `Gousto,HelloFresh` (treated as 4x5)
+      - Multi:  `box_config,Gousto,HelloFresh` with one row per config
+    """
     if not PRICES_DIR.exists():
-        return pd.DataFrame(columns=["week", "brand", "box_price"])
+        return pd.DataFrame(columns=["week", "brand", "box_config", "box_price"])
     rows = []
     for f in sorted(PRICES_DIR.glob("*.csv")):
         m = re.search(r"(\d{4}-W\d{2})", f.stem)
@@ -141,21 +145,32 @@ def load_prices(fingerprint=None):
         df = pd.read_csv(f)
         if df.empty:
             continue
-        first = df.iloc[0]
-        for brand in ("Gousto", "HelloFresh"):
-            if brand in df.columns:
-                try:
-                    rows.append({
-                        "week": week,
-                        "brand": brand,
-                        "box_price": float(first[brand]),
-                    })
-                except (TypeError, ValueError):
-                    pass
+        has_config = "box_config" in df.columns
+        for _, row in df.iterrows():
+            box_config = str(row["box_config"]).strip() if has_config else "4x5"
+            for brand in ("Gousto", "HelloFresh"):
+                if brand in df.columns:
+                    try:
+                        rows.append({
+                            "week": week,
+                            "brand": brand,
+                            "box_config": box_config,
+                            "box_price": float(row[brand]),
+                        })
+                    except (TypeError, ValueError):
+                        pass
     return pd.DataFrame(rows)
 
 
-def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total"):
+BOX_CONFIGS = {
+    "4x5": {"label": "4 people × 5 meals",
+            "portions": 4, "meals": 5, "servings": 20},
+    "2x3": {"label": "2 people × 3 meals",
+            "portions": 2, "meals": 3, "servings": 6},
+}
+
+
+def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total", box_config="4x5"):
     """For each week with both a Gousto and a HelloFresh menu plus a price,
     compute price-per-serving, price-per-100-cal, price-per-100g.
     Returns long-form DataFrame with one row per (week, brand).
@@ -166,6 +181,15 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total"):
     rows = []
     if prices_df.empty:
         return pd.DataFrame(rows)
+
+    # Filter prices down to the requested box config; legacy CSVs default
+    # to '4x5' during load, so this is always safe.
+    if "box_config" in prices_df.columns:
+        prices_df = prices_df[prices_df["box_config"] == box_config]
+    if prices_df.empty:
+        return pd.DataFrame(rows)
+
+    servings = BOX_CONFIGS.get(box_config, {}).get("servings", 20)
 
     def _gousto_has_tier(week):
         """True if Gousto's scrape for this week carries Core/Premium info."""
@@ -216,11 +240,12 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total"):
                     continue
                 avg_kcal = m["kcal_per_serving"].mean()
                 avg_grams = m["grams_per_serving"].mean()
-            pps = box_price / SERVINGS_PER_BOX
+            pps = box_price / servings
             rows.append({
                 "week": week,
                 "brand": brand,
                 "tier": applied_tier_label,
+                "box_config": box_config,
                 "core_methodology": methodology,
                 "box_price": box_price,
                 "Per serving": pps,
@@ -259,6 +284,34 @@ gousto_all = load_gousto(_fingerprint(DATA_DIR, "gousto_menu_*.csv"))
 hf_all = load_hellofresh(_fingerprint(HF_DIR, "*.csv"))
 prices_all = load_prices(_fingerprint(PRICES_DIR, "*.csv"))
 
+# Box-config selector rendered FIRST so all pricing precomputes below react to
+# it. Sits at the top of the sidebar because sidebar blocks are emitted in file
+# order and multiple `with st.sidebar:` blocks append to the same panel.
+with st.sidebar:
+    st.markdown("### Box configuration")
+    selected_box_config = st.radio(
+        "Box size for pricing views",
+        options=list(BOX_CONFIGS.keys()),
+        format_func=lambda k: BOX_CONFIGS[k]["label"],
+        key="box_config",
+        label_visibility="collapsed",
+    )
+    st.caption(
+        f"Applies to the **Pricing comparison** and **Historic trends** tabs "
+        f"only. Currently viewing: **{BOX_CONFIGS[selected_box_config]['label']}** "
+        f"({BOX_CONFIGS[selected_box_config]['servings']} servings)."
+    )
+    st.divider()
+
+# Filter prices to the selected box config so weeks lacking a price row for
+# this config drop out of the pricing views entirely.
+if "box_config" in prices_all.columns:
+    prices_for_config = prices_all[
+        prices_all["box_config"] == selected_box_config
+    ].copy()
+else:
+    prices_for_config = prices_all.copy()
+
 # The 3-week rolling window is now ONLY applied to the pricing-tab bar charts +
 # Δ% summary. Every other surface (underlying numbers tables, historic trends,
 # HelloFresh recipes, Gousto recipes) shows the full history so older weeks
@@ -266,33 +319,29 @@ prices_all = load_prices(_fingerprint(PRICES_DIR, "*.csv"))
 all_weeks = sorted(
     set(gousto_all.get("week", pd.Series(dtype=str)).dropna()) |
     set(hf_all.get("week", pd.Series(dtype=str)).dropna()) |
-    set(prices_all.get("week", pd.Series(dtype=str)).dropna())
+    set(prices_for_config.get("week", pd.Series(dtype=str)).dropna())
 )
-# Only put a week on the 3-week pricing window once it has Gousto + HF +
-# price together. Otherwise we end up flipping to a week (e.g. W22 after
-# Tuesday's HF/price upload) where Gousto hasn't scraped yet and the pricing
-# tab tries to compute deltas against missing data.
 gousto_weeks = set(gousto_all.get("week", pd.Series(dtype=str)).dropna())
 hf_weeks = set(hf_all.get("week", pd.Series(dtype=str)).dropna())
-price_weeks = set(prices_all.get("week", pd.Series(dtype=str)).dropna())
+price_weeks = set(prices_for_config.get("week", pd.Series(dtype=str)).dropna())
 comparable_weeks = sorted(gousto_weeks & hf_weeks & price_weeks)
 visible_weeks = comparable_weeks[-3:] if len(comparable_weeks) >= 3 else comparable_weeks
 if not visible_weeks:
-    visible_weeks = all_weeks[-3:]  # last-ditch fallback for the empty-state warning
+    visible_weeks = all_weeks[-3:]
 
 gousto_window = gousto_all[gousto_all["week"].isin(visible_weeks)] if not gousto_all.empty else gousto_all
 hf_window = hf_all[hf_all["week"].isin(visible_weeks)] if not hf_all.empty else hf_all
-prices_window = prices_all[prices_all["week"].isin(visible_weeks)] if not prices_all.empty else prices_all
+prices_window = prices_for_config[prices_for_config["week"].isin(visible_weeks)] if not prices_for_config.empty else prices_for_config
 
-# Pre-compute the metric tables PER TIER (Total / Core / Premium) once so
-# every tab can pull whichever combination it needs.
 TIERS = ("Total", "Core", "Premium")
 summary_window_by_tier = {
-    t: compute_weekly_metrics(gousto_window, hf_window, prices_window, tier=t)
+    t: compute_weekly_metrics(gousto_window, hf_window, prices_window,
+                              tier=t, box_config=selected_box_config)
     for t in TIERS
 }
 summary_full_by_tier = {
-    t: compute_weekly_metrics(gousto_all, hf_all, prices_all, tier=t)
+    t: compute_weekly_metrics(gousto_all, hf_all, prices_for_config,
+                              tier=t, box_config=selected_box_config)
     for t in TIERS
 }
 summary_window = summary_window_by_tier["Total"]  # back-compat alias
@@ -339,7 +388,8 @@ tab_pricing, tab_trends, tab_hf, tab_gousto, tab_ingredients = st.tabs([
 
 # -------------------- TAB: PRICING (3-week window) --------------------
 with tab_pricing:
-    st.header(f"Weekly pricing comparison — {NUM_PORTIONS} people × {MEALS_PER_BOX} meals box")
+    _cfg = BOX_CONFIGS[selected_box_config]
+    st.header(f"Weekly pricing comparison — {_cfg['label']} box")
 
     if prices_all.empty:
         st.warning(
@@ -483,7 +533,7 @@ with tab_pricing:
 
 # -------------------- TAB: HISTORIC TRENDS (full data, growing) --------------------
 with tab_trends:
-    st.header("Historic price trends")
+    st.header(f"Historic price trends — {BOX_CONFIGS[selected_box_config]['label']}")
 
     full_summary = summary_full_by_tier["Core"]
     if full_summary.empty:
@@ -855,7 +905,8 @@ with st.sidebar:
     )
     st.markdown(
         "**Price per serving** \n"
-        "`= Box price ÷ 20 servings`"
+        f"`= Box price ÷ {BOX_CONFIGS[selected_box_config]['servings']} servings` "
+        f"*(dictated by the selected box configuration above)*"
     )
     st.markdown(
         "**Price per 100 kcal** \n"
