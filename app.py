@@ -613,6 +613,23 @@ with tab_trends:
                     font=dict(size=11, color="#666"),
                 )
 
+            # Vertical marker at each known price change. HelloFresh's headline
+            # price rose at W33 for both box configs (£77.98 → £84.79 for 4x5;
+            # £37.98 → £37.93 for 2x3, i.e. a small drop for 2x3). Both moves
+            # show up as a step on the HF line.
+            PRICE_CHANGES = {"2026-W33": "HF price change →"}
+            for change_week, label in PRICE_CHANGES.items():
+                if change_week in full_summary["week"].values:
+                    fig.add_vline(
+                        x=change_week,
+                        line=dict(color=HF_COLOR, dash="dot", width=1.5),
+                    )
+                    fig.add_annotation(
+                        x=change_week, y=1.02, xref="x", yref="paper",
+                        text=label, showarrow=False, xanchor="left",
+                        font=dict(size=11, color=HF_COLOR),
+                    )
+
             fig.update_layout(
                 title=dict(text=axis_title, x=0.5, xanchor="center",
                            font=dict(size=16, color="#333")),
