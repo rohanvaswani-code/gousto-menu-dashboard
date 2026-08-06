@@ -670,15 +670,19 @@ with tab_trends:
             fig_delta = go.Figure()
             fig_delta.add_hline(y=0, line=dict(color="#999", width=1))
             for metric, color in METRIC_COLORS.items():
-                dm = delta_over_time[delta_over_time["metric"] == metric].sort_values("week")
+                dm = delta_over_time[delta_over_time["metric"] == metric].sort_values("week").copy()
                 if dm.empty:
                     continue
+                # Pre-format label so tooltip always shows exactly 1dp regardless
+                # of Plotly's own numeric formatting decisions.
+                dm["label"] = dm["delta_pct"].apply(lambda v: f"{v:+.1f}%")
                 fig_delta.add_trace(go.Scatter(
                     x=dm["week"], y=dm["delta_pct"],
                     name=metric, mode="lines+markers",
                     line=dict(color=color, width=3),
                     marker=dict(size=9, line=dict(color="white", width=1.5)),
-                    hovertemplate=f"%{{x}}<br>{metric}: %{{y:+.1f}}%<extra></extra>",
+                    text=dm["label"],
+                    hovertemplate=f"{metric}: %{{text}}<extra></extra>",
                 ))
 
             # Carry over the same markers (tier tracking / price change) so
