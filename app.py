@@ -647,6 +647,78 @@ with tab_trends:
             )
             st.plotly_chart(fig, use_container_width=True)
 
+        # -------- Δ% summary chart (HF vs Gousto for all 3 metrics) --------
+        delta_rows = []
+        for week in sorted(full_summary["week"].unique()):
+            wdf = full_summary[full_summary["week"] == week].set_index("brand")
+            if "Gousto" not in wdf.index or "HelloFresh" not in wdf.index:
+                continue
+            for metric in ("Per serving", "Per 100 cal", "Per 100g"):
+                gv = wdf.loc["Gousto", metric]
+                hv = wdf.loc["HelloFresh", metric]
+                if pd.notna(gv) and pd.notna(hv) and gv:
+                    delta_rows.append({"week": week, "metric": metric,
+                                       "delta_pct": (hv - gv) / gv * 100})
+        delta_over_time = pd.DataFrame(delta_rows)
+
+        if not delta_over_time.empty:
+            METRIC_COLORS = {
+                "Per serving": "#5B8DEF",  # blue
+                "Per 100 cal": "#F2A93B",  # amber
+                "Per 100g": "#9B6BD8",     # purple
+            }
+            fig_delta = go.Figure()
+            fig_delta.add_hline(y=0, line=dict(color="#999", width=1))
+            for metric, color in METRIC_COLORS.items():
+                dm = delta_over_time[delta_over_time["metric"] == metric].sort_values("week")
+                if dm.empty:
+                    continue
+                fig_delta.add_trace(go.Scatter(
+                    x=dm["week"], y=dm["delta_pct"],
+                    name=metric, mode="lines+markers",
+                    line=dict(color=color, width=3),
+                    marker=dict(size=9, line=dict(color="white", width=1.5)),
+                    hovertemplate=f"%{{x}}<br>{metric}: %{{y:+.1f}}%<extra></extra>",
+                ))
+
+            # Carry over the same markers (tier tracking / price change) so
+            # everyone reading the chart knows when a step-change is
+            # methodology-driven vs price-driven.
+            if estimated_weeks and "2026-W22" in full_summary["week"].values:
+                fig_delta.add_vline(
+                    x="2026-W22", line=dict(color="#888", dash="dash", width=1),
+                )
+            for change_week in PRICE_CHANGES:
+                if change_week in full_summary["week"].values:
+                    fig_delta.add_vline(
+                        x=change_week,
+                        line=dict(color=HF_COLOR, dash="dot", width=1.5),
+                    )
+
+            fig_delta.update_layout(
+                title=dict(
+                    text="Δ% HelloFresh vs Gousto — over time",
+                    x=0.5, xanchor="center", font=dict(size=16, color="#333"),
+                ),
+                xaxis=dict(title="HelloFresh week", showgrid=False),
+                yaxis=dict(title="Δ% (positive = HF more expensive)",
+                           ticksuffix="%", zeroline=False,
+                           gridcolor="rgba(0,0,0,0.08)"),
+                height=420,
+                margin=dict(l=70, r=30, t=60, b=50),
+                plot_bgcolor="white",
+                legend=dict(orientation="h", x=0, y=1.10,
+                            yanchor="bottom", xanchor="left",
+                            bgcolor="rgba(0,0,0,0)"),
+                hovermode="x unified",
+            )
+            st.plotly_chart(fig_delta, use_container_width=True)
+            st.caption(
+                "Positive values mean HelloFresh is more expensive on that "
+                "metric; negative means HelloFresh is cheaper. Sign flips "
+                "at the horizontal zero line."
+            )
+
         with st.expander("Underlying numbers (full history — Core recipes only)"):
             st.caption(
                 "The `core_methodology` column flags how each row's averages "
