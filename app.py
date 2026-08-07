@@ -348,13 +348,13 @@ with st.sidebar:
             label_visibility="collapsed",
         )
         st.caption(
-            "Applies to **HelloFresh only** — Gousto always excludes pantry items "
-            "from their box (they are never delivered). Pantry items excluded: "
-            "salt & pepper, cooking oils (olive, vegetable, etc.), butter, milk, "
-            "and basic baking staples (flour, sugar). Excluding these from the "
-            "HelloFresh figures gives a like-for-like comparison of the delivered "
-            "ingredients. Affects **Per 100 kcal** and **Per 100g** only — "
-            "Per serving is always box price ÷ servings."
+            "Applies to HelloFresh only — Gousto always excludes pantry items from "
+            "their box and therefore nutritional information. Pantry items excluded: "
+            "salt & pepper, cooking oils (olive, vegetable, etc.), butter, milk, and "
+            "basic baking staples (flour, sugar) as per Gousto website. Excluding "
+            "these from the HelloFresh figures (which by default include them) gives "
+            "a like-for-like comparison in the nutritional information between a "
+            "typical Gousto meal and HelloFresh meal."
         )
         st.divider()
     else:
