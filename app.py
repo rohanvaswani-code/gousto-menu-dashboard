@@ -109,13 +109,35 @@ def load_hellofresh(fingerprint=None):
     files = sorted(HF_DIR.glob("*.csv"), key=lambda p: p.stat().st_mtime)
     if not files:
         return pd.DataFrame()
-    frames = [pd.read_csv(f) for f in files]
+    frames = []
+    for f in files:
+        tmp = pd.read_csv(f)
+        if "total_kcal" in tmp.columns:
+            # New format: kcal and grams provided directly
+            tmp["kcal_per_serving"] = pd.to_numeric(tmp["total_kcal"], errors="coerce")
+            tmp["grams_per_serving"] = pd.to_numeric(tmp["total_grammage"], errors="coerce")
+            tmp["kj_per_serving"] = tmp["kcal_per_serving"] * KJ_PER_KCAL
+            tmp["kcal_net_pantry_per_serving"] = (
+                pd.to_numeric(tmp["kcal_net_pantry"], errors="coerce")
+                if "kcal_net_pantry" in tmp.columns else float("nan")
+            )
+            tmp["grammage_net_pantry_per_serving"] = (
+                pd.to_numeric(tmp["grammage_net_pantry"], errors="coerce")
+                if "grammage_net_pantry" in tmp.columns else float("nan")
+            )
+        elif "calories" in tmp.columns:
+            # Legacy format: calories column is kJ — convert to kcal
+            tmp["kj_per_serving"] = pd.to_numeric(tmp["calories"], errors="coerce")
+            tmp["kcal_per_serving"] = tmp["kj_per_serving"] / KJ_PER_KCAL
+            tmp["grams_per_serving"] = pd.to_numeric(
+                tmp["grams"] if "grams" in tmp.columns else pd.Series(dtype=float),
+                errors="coerce",
+            )
+            tmp["kcal_net_pantry_per_serving"] = float("nan")
+            tmp["grammage_net_pantry_per_serving"] = float("nan")
+        frames.append(tmp)
     df = pd.concat(frames, ignore_index=True)
     df = df.drop_duplicates(subset=["week", "slot_number"], keep="last")
-    # CSV's `calories` column is kJ per serving (per HF labelling); convert to kcal.
-    df["kj_per_serving"] = pd.to_numeric(df["calories"], errors="coerce")
-    df["kcal_per_serving"] = df["kj_per_serving"] / KJ_PER_KCAL
-    df["grams_per_serving"] = pd.to_numeric(df["grams"], errors="coerce")
     df["week"] = df["week"].astype(str)
     # Tier mapping: HelloFresh slots 1-71 are core recipes; 72-80 are premium
     # (surcharge) recipes. This is fixed at the slot-numbering level.
@@ -170,7 +192,7 @@ BOX_CONFIGS = {
 }
 
 
-def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total", box_config="4x5"):
+def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total", box_config="4x5", pantry="total"):
     """For each week with both a Gousto and a HelloFresh menu plus a price,
     compute price-per-serving, price-per-100-cal, price-per-100g.
     Returns long-form DataFrame with one row per (week, brand).
@@ -238,8 +260,17 @@ def compute_weekly_metrics(gousto_df, hf_df, prices_df, tier="Total", box_config
                     m = m[m["tier"] == tier]
                 if m.empty:
                     continue
-                avg_kcal = m["kcal_per_serving"].mean()
-                avg_grams = m["grams_per_serving"].mean()
+                use_net = (
+                    pantry == "net_pantry"
+                    and "kcal_net_pantry_per_serving" in m.columns
+                    and m["kcal_net_pantry_per_serving"].notna().any()
+                )
+                if use_net:
+                    avg_kcal = m["kcal_net_pantry_per_serving"].mean()
+                    avg_grams = m["grammage_net_pantry_per_serving"].mean()
+                else:
+                    avg_kcal = m["kcal_per_serving"].mean()
+                    avg_grams = m["grams_per_serving"].mean()
             pps = box_price / servings
             rows.append({
                 "week": week,
@@ -302,6 +333,27 @@ with st.sidebar:
         f"({BOX_CONFIGS[selected_box_config]['servings']} servings)."
     )
     st.divider()
+    _hf_has_net_pantry = (
+        not hf_all.empty
+        and "kcal_net_pantry_per_serving" in hf_all.columns
+        and hf_all["kcal_net_pantry_per_serving"].notna().any()
+    )
+    if _hf_has_net_pantry:
+        st.markdown("### Pantry items")
+        selected_pantry = st.radio(
+            "Pantry items in 100 kcal / 100g metrics",
+            options=["total", "net_pantry"],
+            format_func=lambda k: "Included" if k == "total" else "Excluded",
+            key="pantry_mode",
+            label_visibility="collapsed",
+        )
+        st.caption(
+            "Affects **Per 100 kcal** and **Per 100g** only — "
+            "Per serving is always box price ÷ servings."
+        )
+        st.divider()
+    else:
+        selected_pantry = "total"
 
 # Filter prices to the selected box config so weeks lacking a price row for
 # this config drop out of the pricing views entirely.
@@ -336,12 +388,14 @@ prices_window = prices_for_config[prices_for_config["week"].isin(visible_weeks)]
 TIERS = ("Total", "Core", "Premium")
 summary_window_by_tier = {
     t: compute_weekly_metrics(gousto_window, hf_window, prices_window,
-                              tier=t, box_config=selected_box_config)
+                              tier=t, box_config=selected_box_config,
+                              pantry=selected_pantry)
     for t in TIERS
 }
 summary_full_by_tier = {
     t: compute_weekly_metrics(gousto_all, hf_all, prices_for_config,
-                              tier=t, box_config=selected_box_config)
+                              tier=t, box_config=selected_box_config,
+                              pantry=selected_pantry)
     for t in TIERS
 }
 summary_window = summary_window_by_tier["Total"]  # back-compat alias
@@ -771,12 +825,25 @@ with tab_hf:
             f"{f['recipe_title'].nunique():,} unique recipes · "
             f"**{n_core:,} Core**, **{n_prem:,} Premium**"
         )
-        show = f[["week", "slot_number", "tier", "recipe_title",
-                  "kcal_per_serving", "kj_per_serving", "grams_per_serving"]].copy()
-        show["kcal_per_serving"] = show["kcal_per_serving"].round(0)
-        show["kj_per_serving"] = show["kj_per_serving"].round(0)
+        _net_cols_available = (
+            "kcal_net_pantry_per_serving" in f.columns
+            and f["kcal_net_pantry_per_serving"].notna().any()
+        )
+        _display_cols = ["week", "slot_number", "tier", "recipe_title",
+                         "kcal_per_serving", "grams_per_serving"]
+        if _net_cols_available:
+            _display_cols += ["kcal_net_pantry_per_serving", "grammage_net_pantry_per_serving"]
+        show = f[_display_cols].copy()
+        show["kcal_per_serving"] = show["kcal_per_serving"].round(1)
         show["grams_per_serving"] = show["grams_per_serving"].round(1)
-        show = show.rename(columns={"week": "hellofresh_week"})
+        if _net_cols_available:
+            show["kcal_net_pantry_per_serving"] = show["kcal_net_pantry_per_serving"].round(1)
+            show["grammage_net_pantry_per_serving"] = show["grammage_net_pantry_per_serving"].round(1)
+        show = show.rename(columns={
+            "week": "hellofresh_week",
+            "kcal_net_pantry_per_serving": "kcal_excl_pantry",
+            "grammage_net_pantry_per_serving": "grams_excl_pantry",
+        })
         st.dataframe(
             show.sort_values(["hellofresh_week", "slot_number"], ascending=[False, True]),
             use_container_width=True, hide_index=True,
@@ -1006,13 +1073,15 @@ with st.sidebar:
         "**Price per 100 kcal** \n"
         "`= Price per serving ÷ (avg kcal per serving ÷ 100)`  \n"
         "*Avg kcal per serving* is the mean across **Core recipes only** on "
-        "that brand's menu for the week — i.e. recipes the standard box "
-        "price covers, with no surcharge upgrades."
+        "that brand's menu for the week. When **Pantry items: Excluded** is "
+        "selected, HelloFresh uses the `kcal_net_pantry` column from the uploaded "
+        "CSV (oils, spices, and sauces removed from the calorie count)."
     )
     st.markdown(
         "**Price per 100g** \n"
         "`= Price per serving ÷ (avg grams per serving ÷ 100)`  \n"
-        "*Avg grams per serving* is calculated the same way (Core only)."
+        "*Avg grams per serving* is calculated the same way (Core only). "
+        "When **Pantry items: Excluded**, HelloFresh uses `grammage_net_pantry`."
     )
     st.info(
         "⚠ **Methodology note**: Gousto surcharge tracking was added on "
