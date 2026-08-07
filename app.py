@@ -348,7 +348,12 @@ with st.sidebar:
             label_visibility="collapsed",
         )
         st.caption(
-            "Affects **Per 100 kcal** and **Per 100g** only — "
+            "Applies to **HelloFresh only** — Gousto always excludes pantry items "
+            "from their box (they are never delivered). Pantry items excluded: "
+            "salt & pepper, cooking oils (olive, vegetable, etc.), butter, milk, "
+            "and basic baking staples (flour, sugar). Excluding these from the "
+            "HelloFresh figures gives a like-for-like comparison of the delivered "
+            "ingredients. Affects **Per 100 kcal** and **Per 100g** only — "
             "Per serving is always box price ÷ servings."
         )
         st.divider()
@@ -1081,7 +1086,10 @@ with st.sidebar:
         "**Price per 100g** \n"
         "`= Price per serving ÷ (avg grams per serving ÷ 100)`  \n"
         "*Avg grams per serving* is calculated the same way (Core only). "
-        "When **Pantry items: Excluded**, HelloFresh uses `grammage_net_pantry`."
+        "When **Pantry items: Excluded**, HelloFresh uses `grammage_net_pantry`. "
+        "Gousto is unaffected — their API nutrition data already excludes pantry "
+        "items (salt & pepper, oils, butter, milk, flour, sugar) because Gousto "
+        "never delivers them in the box."
     )
     st.info(
         "⚠ **Methodology note**: Gousto surcharge tracking was added on "
