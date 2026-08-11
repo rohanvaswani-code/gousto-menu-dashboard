@@ -548,7 +548,10 @@ with tab_pricing:
             plot_bgcolor="white",
         )
         with col:
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(
+                fig, use_container_width=True,
+                key=f"price_{metric_name}_{selected_box_config}_{selected_pantry}",
+            )
 
     if not delta_df.empty:
         delta_table = (delta_df.pivot(index="metric", columns="week", values="delta")
@@ -609,10 +612,12 @@ with tab_trends:
         )
         estimated_weeks = sorted(full_summary.loc[est_mask, "week"].unique())
 
+        _pantry_label = ("pantry items **excluded**" if selected_pantry == "net_pantry"
+                         else "pantry items **included**")
         st.caption(
             f"Tracking **{n_weeks} week(s)** — averaged across **Core recipes "
-            f"only**. Each Tuesday/Wednesday update extends these charts by "
-            f"one week."
+            f"only**, HelloFresh with {_pantry_label}. Each Tuesday/Wednesday "
+            f"update extends these charts by one week."
         )
         if estimated_weeks:
             st.warning(
@@ -704,7 +709,13 @@ with tab_trends:
                             bgcolor="rgba(0,0,0,0)"),
                 hovermode="x unified",
             )
-            st.plotly_chart(fig, use_container_width=True)
+            # Explicit key including box config + pantry mode. Without it these
+            # charts keep a stale render when only y-values change inside an
+            # otherwise-identical trace structure (same traces, names, x values).
+            st.plotly_chart(
+                fig, use_container_width=True,
+                key=f"trend_{metric_name}_{selected_box_config}_{selected_pantry}",
+            )
 
         # -------- Δ% summary chart (HF vs Gousto for all 3 metrics) --------
         delta_rows = []
@@ -775,7 +786,10 @@ with tab_trends:
                             bgcolor="rgba(0,0,0,0)"),
                 hovermode="x unified",
             )
-            st.plotly_chart(fig_delta, use_container_width=True)
+            st.plotly_chart(
+                fig_delta, use_container_width=True,
+                key=f"trend_delta_{selected_box_config}_{selected_pantry}",
+            )
             st.caption(
                 "Positive values mean HelloFresh is more expensive on that "
                 "metric; negative means HelloFresh is cheaper. Sign flips "
