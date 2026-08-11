@@ -627,26 +627,6 @@ with tab_trends:
                 icon="⚠",
             )
 
-        if selected_pantry == "net_pantry" and _hf_has_net_pantry:
-            _hf_net_weeks = set(
-                hf_all.loc[hf_all["kcal_net_pantry_per_serving"].notna(), "week"].unique()
-            )
-            _chart_hf_weeks = set(
-                full_summary.loc[full_summary["brand"] == "HelloFresh", "week"].unique()
-            )
-            _missing_net = sorted(_chart_hf_weeks - _hf_net_weeks)
-            if _missing_net:
-                st.warning(
-                    f"⚠ **Pantry-excluded mode is partially applied.** "
-                    f"{len(_missing_net)} week(s) — {', '.join(_missing_net)} — "
-                    f"were uploaded in the **old CSV format** (no `kcal_net_pantry` / "
-                    f"`grammage_net_pantry` columns) and still show **total** figures "
-                    f"on this chart. To apply pantry exclusion to these weeks, "
-                    f"re-upload them in the new format with all four columns: "
-                    f"`total_kcal`, `total_grammage`, `kcal_net_pantry`, `grammage_net_pantry`.",
-                    icon="⚠",
-                )
-
         for metric_name, axis_title in (
             ("Per serving", "Price per serving (£) — incl. shipping"),
             ("Per 100 cal", "Price per 100 kcal (£)"),
